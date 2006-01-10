@@ -90,8 +90,8 @@ module Person
       @name
     end
     def flush
-      puts @messages.join("\n\n")
-      @messages.clear
+      # puts @messages.join("\n\n")
+      # @messages.clear
     end
   end
 end

@@ -727,7 +727,7 @@ module TextInterface
         end
       end
       if not placements.empty?
-        post map_str(@current_game.map)
+        post_map(@current_game)
         response = "Du har placerat ut följande arméer:\n"
         response += placements.collect do |country, armies|
           if armies > 0
