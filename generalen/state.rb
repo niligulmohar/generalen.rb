@@ -88,11 +88,25 @@ class State
     end
   end
 
-  ADMIN_REQUESTS = ([ ])
+  ADMIN_REQUESTS = ([ :stop, :start, :push_deadlines ])
   PERSON_REQUESTS = ([ :new_game ])
   GAME_REQUESTS = Game::Game::ADMIN_REQUESTS + Game::Game::PLAYER_REQUESTS + Game::Game::PERSON_REQUESTS
 
   private
+  def stop
+  end
+
+  def start
+  end
+
+  def push_deadlines(params = {})
+    @store[:games].each do |g|
+      if g.turn_deadline
+        g.turn_deadline += params[:time]
+      end
+    end
+  end
+
   def new_game(params = {})
     games = @store[:games].select{ |g| g.active and g.people.include?(params[:person]) }
     if games.length > 17

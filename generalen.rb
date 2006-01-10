@@ -76,14 +76,19 @@ begin
   timeout_thread = Thread.new do
     loop do
       sleep(10)
-      $state.with_person(:admin) do |p|
-        $state.running_games.each do |g|
-          if $state.request(:person => p, :game => g, :type => :timeout_poll)
-            g.people.each do |p2|
-              p2.flush
+      begin
+        $state.with_person(:admin) do |p|
+          $state.running_games.each do |g|
+            if $state.request(:person => p, :game => g, :type => :timeout_poll)
+              g.people.each do |p2|
+                p2.flush
+              end
             end
           end
         end
+      rescue Exception => e
+        puts e
+        puts e.backtrace
       end
     end
   end
