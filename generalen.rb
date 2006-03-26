@@ -16,6 +16,7 @@ begin
 rescue LoadError => e
   def read(prompt)
     print(prompt)
+    $stdout.flush
     return gets
   end
 end
@@ -32,6 +33,7 @@ class Generalen < KomBot
     if msg.recipient == @params[:person]
       if msg.sender == @params[:person]
         $logger.debug('pong!')
+        return
       end
       $logger.info 'send_message %s: %s' % [ c.conf_name(msg.sender), msg.message ]
       Thread.new do
@@ -64,7 +66,7 @@ class Generalen < KomBot
 
   def periodic
     send_message(@params[:person], 'ping!')
-    $logger.info('ping!')
+    $logger.debug('ping!')
   end
 end
 

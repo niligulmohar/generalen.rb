@@ -55,14 +55,14 @@ module Person
               $logger.warn('Fetstort meddelande, delas på ett fult sätt')
               string = msg
               while string.length > MAXLENGTH
-                send(string[0...MAXLENGTH])
+                send_message(string[0...MAXLENGTH])
                 string = string[MAXLENGTH..-1]
               end
               if not string.empty?
-                send(string)
+                send_message(string)
               end
             else
-              send(acc)
+              send_message(acc)
               acc = msg
             end
           else
@@ -72,7 +72,7 @@ module Person
             acc << msg
           end
         end
-        send(acc)
+        send_message(acc)
       rescue Kom::MessageNotSent
         puts "Trasigt"
         $logger.error('Kom::MessageNotSent inträffade')
@@ -85,7 +85,7 @@ module Person
       $kombot.conf_name(@personno)
     end
     private
-    def send(string)
+    def send_message(string)
       $logger.debug("Meddelande till %s:\n%s" % [name, string])
       $kombot.send_message(@personno, string)
     end

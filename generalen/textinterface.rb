@@ -487,10 +487,10 @@ module TextInterface
       else
         send(Commands[alts[0].first], alts[0].last)
       end
-    rescue CommandError => e
-      post e.message
     rescue NoCurrentGameException
       post 'Du är inte aktiv i något parti!'
+    rescue CommandError => e
+      post e.message
     rescue Game::NotInTurnException
       post 'Du får vänta på din tur!'
     rescue Game::TurnPhaseException => e
