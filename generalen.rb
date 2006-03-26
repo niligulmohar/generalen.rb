@@ -3,11 +3,22 @@
 require 'generalen/state'
 require 'generalen/game'
 require 'generalen/person'
+require 'util/backup'
 require 'util/prefix_words_matches'
 require 'util/random'
 require 'kombot'
 require 'logger'
-require 'readline'
+begin
+  require 'readline'
+  def read(prompt)
+    Readline.readline(prompt, true)
+  end
+rescue LoadError => e
+  def read(prompt)
+    print(prompt)
+    return gets
+  end
+end
 
 class Generalen < KomBot
   def initialize(params = {})
@@ -19,7 +30,10 @@ class Generalen < KomBot
 
   def async_send_message(msg, c)
     if msg.recipient == @params[:person]
-      $logger.info "send_message %s: %s" % [ c.conf_name(msg.sender), msg.message ]
+      if msg.sender == @params[:person]
+        $logger.debug('pong!')
+      end
+      $logger.info 'send_message %s: %s' % [ c.conf_name(msg.sender), msg.message ]
       Thread.new do
         $state.with_person(msg.sender) do |p|
           if not p
@@ -47,26 +61,39 @@ class Generalen < KomBot
       $logger.debug "login %s done" % [c.conf_name(msg.person_no)]
     end
   end
+
+  def periodic
+    send_message(@params[:person], 'ping!')
+    $logger.info('ping!')
+  end
 end
 
 
 ######################################################################
 
-$logger = Logger.new(File.new('GENERALEN.LOG', 'a+'), 10, 1024**2)
+$KOM_SETTINGS = ({ :server => 'kom.lysator.liu.se',
+                   :person => 12668,
+                   :password => '64llob' })
+STATE_FILE_NAME = 'GENERALEN.STATE'
+LOG_FILE_NAME = 'GENERALEN.LOG'
+
+$logger = Logger.new(File.new(LOG_FILE_NAME, 'a+'), 10, 1024**2)
 $logger.info('started')
-$state = State.new('GENERALEN.STATE', Random::Source.new)
+
+Backup::with_rotation(STATE_FILE_NAME)
+$state = State.new(STATE_FILE_NAME, Random::Source.new)
 $state.register_person(:Test, Person::TestPerson, 'Test')
 $state.register_person(:Ap, Person::TestPerson, 'Ap')
 
-Thread.abort_on_exception = true
+
+# Thread.abort_on_exception = true
 
 begin
   kom_thread = Thread.new do
     begin
-      $kombot = Generalen.new(:server => 'kom.lysator.liu.se',
-                              :person => 12668,
-                              :password => '64llob')
+      $kombot = Generalen.new($KOM_SETTINGS)
       $kombot.run
+    rescue Interrupt
     rescue Exception => e
       puts e
       puts e.backtrace
@@ -74,7 +101,7 @@ begin
   end
 
   timeout_thread = Thread.new do
-    loop do
+    loop do #while not $shutdown
       sleep(10)
       begin
         $state.with_person(:admin) do |p|
@@ -95,9 +122,7 @@ begin
 
   loop do
     begin
-      #cmd = Readline.readline('--- generalen> ', true)
-      print('--- generalen> ')
-      cmd = gets
+      cmd = read((if $kombot.running? then '-!-' else '---' end) + ' generalen> ')
       if not cmd
         puts
         break
@@ -125,8 +150,11 @@ begin
       puts e.backtrace
     end
   end
-  kom_thread.join
+  $shutdown = true
+  timeout_thread.raise(Interrupt.new)
+  kom_thread.raise(Interrupt.new)
   timeout_thread.join
+  kom_thread.join
 rescue Interrupt
   puts
 end
