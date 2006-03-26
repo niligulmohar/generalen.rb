@@ -2,6 +2,7 @@
 
 require 'test/unit'
 require 'util/random'
+require 'util/swedish'
 require 'generalen/state'
 require 'generalen/game'
 require 'generalen/person'
@@ -207,7 +208,7 @@ class BigTestCase < Test::Unit::TestCase
       assert_match( /Turordningen.*Svenzuno.*Pelle.*Stina/m, p.get )
       assert_match( /Ditt uppdrag.*Utplåna Pelle/, p.get )
       assert_match( /Du tilldelas fjorton länder.*Du har 21 arméer/m, p.get )
-      p.command('pl ven 3 n g 3 syda 3 Östa 3')
+      p.command('pl ven 3 n g 3 syda 3 östa 3')
       assert_match( /Du har placerat/, p.get )
       assert_match( /Du har nio arméer kvar/, p.get )
       p.command('pl egy -1')
@@ -248,7 +249,7 @@ class BigTestCase < Test::Unit::TestCase
       assert_match( /Väntar på.*Pelle.*Stina/m, p.get )
       assert_match( /Pelle är klar/, p.get )
       assert_match( /Väntar på.*Stina/m, p.get )
-      p.command('pl 3 Ö a 3 arg 3 indo 3 bra 3 sia 3 norda 3 kin')
+      p.command('pl 3 ö a 3 arg 3 indo 3 bra 3 sia 3 norda 3 kin')
       assert_match( /Du har placerat/, p.get )
       assert_match( /Säg "klar"/, p.get )
       p.command('kl')
@@ -281,9 +282,9 @@ class BigTestCase < Test::Unit::TestCase
       p.command('an ig')
       assert_match( /Svenzuno.*anfaller.*Pelle.*6.*1/m, p.get )
       assert_match( /Svenzuno erövrar Kongo/m, p.get )
-      p.command('pl Östa -1')
+      p.command('pl östa -1')
       assert_match( /Du får inte placera arméer eller använda kort, för du har redan anfallit/, p.get )
-      p.command('fl 1 från Östa till kon')
+      p.command('fl 1 från östa till kon')
       assert_match( /Svenzuno flyttar en armé från/, p.get )
       p.command('fl 1 från syda till kon')
       assert_match( /Du får inte flytta så många arméer därifrån/, p.get )
@@ -390,8 +391,83 @@ class BigTestCase < Test::Unit::TestCase
       [ :a, :b, :c ].each do |c|
         p.current_game.people_players[p].recieve_card(c)
       end
+      p.command('ko')
+      assert_match( /exempel/, p.get )
+      assert_match( /.A. .B. .C./, p.get )
+      assert_match( /uppdrag/, p.get )
       p.command('ko a b c')
       assert_match( /Stina får tio extra arméer för följande kort/, p.get )
+      p.command('ko')
+      assert_match( /exempel/, p.get )
+      assert_match( /Inga kort/, p.get )
+      assert_match( /uppdrag/, p.get )
+    end
+  end
+
+  def test_multiple_games
+    $state.with_person(:Pelle) do |p|
+      p.command('ny')
+      assert_match( /Du har skapat Första partiet/, p.get )
+      assert_match( /Inställningar för/, p.get )
+      assert_match( /Du är nu aktiv i Första partiet/, p.get )
+      p.command('sät spe=vär')
+      assert_match( /Världsdominans/, p.get )
+    end
+    $state.with_person(:Stina) do |p|
+      p.command('de')
+      assert_match( /Du har gått med i Första partiet/, p.get )
+      assert_match( /Inställningar för/, p.get )
+      assert_match( /Deltagare i/, p.get )
+      assert_match( /Du är nu aktiv i Första partiet/, p.get )
+      p.command('bö')
+      assert_match( /Stina är redo/, p.get )
+      assert_match( /Väntar på.*Pelle/m, p.get )
+    end
+    $state.with_person(:Pelle) do |p|
+      assert_match( /Stina har gått med i Första partiet/, p.get )
+      assert_match( /Skriv "börja"/, p.get )
+      assert_match( /Stina är redo att börja i Första partiet/, p.get )
+      assert_match( /Väntar på.*Pelle/m, p.get )
+      p.command('ny')
+      assert_match( /Du har skapat Andra partiet/, p.get )
+      assert_match( /Inställningar för/, p.get )
+      assert_match( /Du är nu aktiv i Andra partiet/, p.get )
+      p.command('sät spe=vär')
+      assert_match( /Världsdominans/, p.get )
+    end
+    $state.with_person(:Stina) do |p|
+      p.command('de')
+      assert_match( /Du har gått med i Andra partiet/, p.get )
+      assert_match( /Inställningar för/, p.get )
+      assert_match( /Deltagare i/, p.get )
+      assert_match( /Du är nu aktiv i Andra partiet/, p.get )
+      p.command('bö')
+      assert_match( /Stina är redo/, p.get )
+      assert_match( /Väntar på.*Pelle/m, p.get )
+    end
+    $state.with_random_source do |r|
+      r.choose_results.push([0, 1])
+      r.choose_results.push(*((0..41).collect.reverse.collect{ |n| [n] }))
+    end
+    $state.with_person(:Pelle) do |p|
+      assert_match( /Stina har gått med i Andra partiet/, p.get )
+      assert_match( /Skriv "börja"/, p.get )
+      assert_match( /Stina är redo att börja i Andra partiet/, p.get )
+      assert_match( /Väntar på.*Pelle/m, p.get )
+      p.command('gå fö')
+      assert_match( /Du är nu aktiv i Första partiet/, p.get )
+      p.command('bö')
+      assert_match( /Pelle är redo/, p.get )
+      assert_match( /Första partiet har börjat!/, p.get )
+      assert_match( /Turordningen.*Pelle.*Stina/m, p.get )
+      assert_match( /Du tilldelas 21 länder.*Du har nitton arméer/m, p.get )
+    end
+    $state.with_person(:Stina) do |p|
+      assert_match( /Pelle är redo/, p.get )
+      assert_match( /Första partiet har börjat!/, p.get )
+      assert_match( /Turordningen.*Pelle.*Stina/m, p.get )
+      assert_match( /Du tilldelas 21 länder.*Du har nitton arméer/m, p.get )
+      assert_match( /Du är nu aktiv i Första partiet/, p.get )
     end
   end
 

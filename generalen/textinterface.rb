@@ -142,7 +142,7 @@ module TextInterface
       remaining = game.turn_deadline - Time.now
       return ' [%s]' % (if remaining <= 0
                           'Deadline passerad!'
-                         elsif remaining > 3600
+                        elsif remaining > 3600
                           '%d timmar till dragdeadline' % (remaining / 3600)
                         elsif remaining > 60
                           '%d minuter till dragdeadline' % (remaining / 60)
@@ -252,6 +252,13 @@ module TextInterface
     def dice_text(dice)
       dice.collect{ |d| '[%d]' % d }.join(' ')
     end
+    def may_auto_change_game?
+      if @person.current_game
+        @person.current_game != @game and @person.current_game.ongoing and not @person.current_game.in_turn(@person)
+      else
+        true
+      end
+    end
     def update(type, params = {})
       case type
       when :join
@@ -300,6 +307,9 @@ module TextInterface
         @person.post("Du tilldelas %s: %s.\n\nDu har %s att placera ut." % ([ countries.length.swedish_quantity('land', 'länder', :neutrum => true),
                                                                               countries.collect{ |c| c.name }.sort.swedish,
                                                                               player.armies_for_placement.swedish_quantity('armé', 'arméer') ]))
+        if may_auto_change_game?
+          @person.go_to_impl(@game)
+        end
       when :surrender
         @person.post('%s har kapitulerat i %s!' % [ params[:person].name, @game.name ])
       when :defeated
@@ -332,9 +342,7 @@ module TextInterface
           if player.total_cards >= 5
             @person.post('Du måste använda en uppsättning kort den här omgången.')
           end
-          if @person.current_game and @person.current_game != @game and @person.current_game.ongoing and not @person.current_game.in_turn(@person)
-            @person.go_to_impl(@game)
-          elsif not @person.current_game
+          if may_auto_change_game?
             @person.go_to_impl(@game)
           end
         else
@@ -438,6 +446,9 @@ module TextInterface
                 ['flytta'] => :move,
                 ['kort'] => :cards,
                 ['karta'] => :map,
+                ['administrera', 'starta'] => :start,
+                ['administrera', 'stoppa'] => :stop,
+                ['administrera', 'skjut', 'upp', 'deadlines'] => :push_deadlines,
 
                 ['elisphack'] => :elisphack,
                 ['status'] => :status,
@@ -509,6 +520,10 @@ module TextInterface
     text << "\nNamn och fraser går att kom-förkorta varhelst man vill."
     text << "\n\nFramför klagomål till <person 9023: Nicklas Lindgren (Äter mopeder, öppnar kasino)>\n\nGurk. Ost."
     post text
+  end
+
+  def push_deadlines(words = [])
+    request(:type => :push_deadlines, :time => 3600 * 12)
   end
 
   def join_impl(game, notification = true)
