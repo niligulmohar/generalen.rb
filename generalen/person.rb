@@ -48,16 +48,34 @@ module Person
     end
     def flush
       begin
-        string = messages.join("\n\n")
-        while string.length > MAXLENGTH
-          $kombot.send_message(@personno, string[0...MAXLENGTH])
-          string = string[MAXLENGTH..-1]
+        acc = ''
+        messages.each do |msg|
+          if acc.length + msg.length + 2 > MAXLENGTH
+            if acc.empty?
+              $logger.warn('Fetstort meddelande, delas på ett fult sätt')
+              string = msg
+              while string.length > MAXLENGTH
+                send(string[0...MAXLENGTH])
+                string = string[MAXLENGTH..-1]
+              end
+              if not string.empty?
+                send(string)
+              end
+            else
+              send(acc)
+              acc = msg
+            end
+          else
+            unless acc.empty?
+              acc << "\n\n"
+            end
+            acc << msg
+          end
         end
-        if not string.empty?
-          $kombot.send_message(@personno, string)
-        end
+        send(acc)
       rescue Kom::MessageNotSent
         puts "Trasigt"
+        $logger.error('Kom::MessageNotSent inträffade')
       else
         @map_message = nil
         @messages.clear
@@ -65,6 +83,11 @@ module Person
     end
     def name
       $kombot.conf_name(@personno)
+    end
+    private
+    def send(string)
+      $logger.debug("Meddelande till %s:\n%s" % [name, string])
+      $kombot.send_message(@personno, string)
     end
   end
 
