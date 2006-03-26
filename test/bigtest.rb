@@ -446,8 +446,10 @@ class BigTestCase < Test::Unit::TestCase
       assert_match( /Väntar på.*Pelle/m, p.get )
     end
     $state.with_random_source do |r|
-      r.choose_results.push([0, 1])
-      r.choose_results.push(*((0..41).collect.reverse.collect{ |n| [n] }))
+      2.times do
+        r.choose_results.push([0, 1])
+        r.choose_results.push(*((0..41).collect.reverse.collect{ |n| [n] }))
+      end
     end
     $state.with_person(:Pelle) do |p|
       assert_match( /Stina har gått med i Andra partiet/, p.get )
@@ -462,12 +464,48 @@ class BigTestCase < Test::Unit::TestCase
       assert_match( /Turordningen.*Pelle.*Stina/m, p.get )
       assert_match( /Du tilldelas 21 länder.*Du har nitton arméer/m, p.get )
     end
+    # Byte från öppet parti till parti där första placering börjar
     $state.with_person(:Stina) do |p|
       assert_match( /Pelle är redo/, p.get )
       assert_match( /Första partiet har börjat!/, p.get )
       assert_match( /Turordningen.*Pelle.*Stina/m, p.get )
       assert_match( /Du tilldelas 21 länder.*Du har nitton arméer/m, p.get )
       assert_match( /Du är nu aktiv i Första partiet/, p.get )
+    end
+    $state.with_person(:Pelle) do |p|
+      p.command('gå an')
+      assert_match( /Du är nu aktiv i Andra partiet/, p.get )
+      p.command('bö')
+      assert_match( /Pelle är redo/, p.get )
+      assert_match( /Andra partiet har börjat!/, p.get )
+      assert_match( /Turordningen.*Pelle.*Stina/m, p.get )
+      assert_match( /Du tilldelas 21 länder.*Du har nitton arméer/m, p.get )
+    end
+    # Inget byte från ett parti där första placeringen pågår
+    $state.with_person(:Stina) do |p|
+      assert_match( /Pelle är redo/, p.get )
+      assert_match( /Andra partiet har börjat!/, p.get )
+      assert_match( /Turordningen.*Pelle.*Stina/m, p.get )
+      assert_match( /Du tilldelas 21 länder.*Du har nitton arméer/m, p.get )
+      assert_nil( p.get )
+    end
+    # Byte till ett parti där första placeringen pågår, när man är klar
+    $state.with_person(:Stina) do |p|
+      p.command('pla 3 ö a 3 syda 3 mada 3 indo 3 östa 2 peru 2 sia')
+      assert_match( /Du har placerat/, p.get )
+      assert_match( /Säg "klar"/, p.get )
+      p.command('kl')
+      assert_match( /Stina är klar/, p.get )
+      assert_match( /Väntar på.*Pelle/m, p.get )
+      assert_match( /Du är nu aktiv i Andra partiet/, p.get )
+    end
+    $state.with_person(:Stina) do |p|
+      p.command('pla 3 ö a 3 syda 3 mada 3 indo 3 östa 2 peru 2 sia')
+      assert_match( /Du har placerat/, p.get )
+      assert_match( /Säg "klar"/, p.get )
+      p.command('kl')
+      assert_match( /Stina är klar/, p.get )
+      assert_match( /Väntar på.*Pelle/m, p.get )
     end
   end
 

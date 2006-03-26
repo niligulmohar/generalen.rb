@@ -54,6 +54,10 @@ class KomBot
     @conn.conf_name(person)
   end
 
+  def running?
+    @conn
+  end
+
   private
 
   def periodic

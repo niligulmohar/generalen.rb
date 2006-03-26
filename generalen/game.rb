@@ -112,13 +112,16 @@ module Game
     PERSON_REQUESTS = ([ :join ])
 
     def open
-      @started == false and @ended == false
+      not @started or @ended
     end
     def finished
-      @ended == true and @started == true
+      @ended and @started
     end
     def active
-      @ended == false
+      not @ended
+    end
+    def first_placement
+      @started and not first_placement_done
     end
     def first_placement_done
       @round > 0
@@ -129,6 +132,8 @@ module Game
     def in_turn(person)
       if not @started
         false
+      elsif first_placement
+        not @people_players[person].first_placement_done
       else
         @turn_queue.first != :new_round and @turn_queue.first.person == person
       end

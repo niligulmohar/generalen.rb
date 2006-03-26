@@ -23,12 +23,20 @@ class State
         @store[:last_game_number] = 0
         @store[:inited] = true
         @store[:random] = random_source
+        @store
       end
     end
   end
 
-  def register_person(key, klass, *params)
+  def transaction(&block)
     @store.transaction do
+      @store[:mtime] = Time.now
+      block.call()
+    end
+  end
+
+  def register_person(key, klass, *params)
+    transaction do
       if @store[:people].has_key?(key)
         if not @store[:people][key].instance_of?(klass)
           raise TypeError('Person expected to be of different class')
@@ -40,14 +48,14 @@ class State
 
   def with_person(key)
     @mutex.synchronize do
-      @store.transaction do
+      transaction do
         yield @store[:people][key]
       end
     end
   end
 
   def with_random_source
-    @store.transaction do
+    transaction do
       yield @store[:random]
     end
   end
@@ -100,9 +108,10 @@ class State
   end
 
   def push_deadlines(params = {})
+    $logger.info "Pushing deadlines"
     @store[:games].each do |g|
       if g.turn_deadline
-        g.turn_deadline += params[:time]
+        g.turn_deadline = Time.now + params[:time]
       end
     end
   end
