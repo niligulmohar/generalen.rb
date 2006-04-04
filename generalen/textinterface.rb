@@ -179,6 +179,9 @@ module TextInterface
     elsif not player.game.first_placement_done and player.game.in_turn(player.person)
       result << ' [ska placera arméer]'
     end
+    if player.game.open and player.ready
+      result << ' [Redo att börja]'
+    end
     return result
   end
 
