@@ -78,6 +78,7 @@ $KOM_SETTINGS = ({ :server => 'kom.lysator.liu.se',
                    :password => '64llob' })
 STATE_FILE_NAME = 'GENERALEN.STATE'
 LOG_FILE_NAME = 'GENERALEN.LOG'
+ADMIN_PERSON = 9023
 
 $logger = Logger.new(File.new(LOG_FILE_NAME, 'a+'), 10, 1024**2)
 $logger.info('started')
@@ -130,7 +131,7 @@ begin
         break
       elsif not cmd.empty?
         if cmd =~ (/^:/)
-          $state.with_person(:admin) do |p|
+          $state.with_person(:Test) do |p|
             puts eval(cmd[1..-1])
             #p.command(cmd[1..-1])
             #p.flush
@@ -152,11 +153,13 @@ begin
       puts e.backtrace
     end
   end
-  $shutdown = true
-  timeout_thread.raise(Interrupt.new)
-  kom_thread.raise(Interrupt.new)
-  timeout_thread.join
-  kom_thread.join
 rescue Interrupt
   puts
+ensure
+  $shutdown = true
+  [timeout_thread, kom_thread].each do |t|
+    t.raise(Interrupt.new)
+    t.join
+  end
 end
+

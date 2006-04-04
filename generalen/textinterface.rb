@@ -73,7 +73,8 @@ module TextInterface
 ~~~~~~~~~~~~~/ %3s  /~~~~~~~~~~~~~~~~~\      /~/    /~~~~~~~~~~__/     __/  \~~
 ~~~~~~~~~~~~/      /~~~~~~~~~~~~~~~~~~~\ %3s \~\___/~~~~~~~~~~/   %3s /      \~
 ~~~~~~~~~~~~\     /~~~~~~~~~~~~~~~~~~~~~\    /~~~~~~~~~~~~~~~~\      /  %3s  /~
-~~~~~~~~~~~~~\___/~~~~~~~~~~~~~~~~~~~~~~~\__/~~~~~~~~~~~~~~~~~/_____/_______/~~'
+~~~~~~~~~~~~~\___/~~~~~~~~~~~~~~~~~~~~~~~\__/~~~~~~~~~~~~~~~~~/_____/_______/~~
+'
 
   INITIALS = ['#', 'X', 'O', '%', '@', '¤']
 
@@ -126,10 +127,10 @@ module TextInterface
           remaining = total_pluses - plus_distribution.inject(0){ |acc, p| acc + p.last }
           plus_distribution << ['-', remaining]
 
-          result << ' '*8 + (['.']*5).join(' '*20) + "\n"
-          result << " Länder [%s]\n" % distribution_graph(country_distribution, 83)
-          result << " Arméer [%s]\n" % distribution_graph(army_distribution, 83)
-          result << '   Plus [%s]' % distribution_graph(plus_distribution, 83)
+          result << ' '*8 + (['.']*5).join(' '*16) + "\n"
+          result << " Länder [%s]\n" % distribution_graph(country_distribution, 67)
+          result << " Arméer [%s]\n" % distribution_graph(army_distribution, 67)
+          result << '   Plus [%s]' % distribution_graph(plus_distribution, 67)
         end
         return result
       end
@@ -162,7 +163,7 @@ module TextInterface
     elsif player.loser
       result << ' [Besegrad]'
     end
-    if player.game.in_turn(player.person)
+    if player.game.in_turn(player.person) and player.game.first_placement_done
       result << ' [I tur]'
       return result if short
       parts = []
@@ -172,9 +173,11 @@ module TextInterface
       if player.armies_for_movement != 0
         parts << '%d att flytta' % player.armies_for_movement
       end
-      result << ' [%s]' % parts.join(', ')
+      result << ' [%s]' % parts.join(', ') unless parts.empty?
     elsif not player.game.first_placement_done and current
       result << ' [%d att placera]' % player.armies_for_placement
+    elsif not player.game.first_placement_done and player.game.in_turn(player.person)
+      result << ' [ska placera arméer]'
     end
     return result
   end

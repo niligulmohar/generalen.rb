@@ -72,7 +72,7 @@ module Person
             acc << msg
           end
         end
-        send_message(acc)
+        send_message(acc) unless acc.empty?
       rescue Kom::MessageNotSent
         puts "Trasigt"
         $logger.error('Kom::MessageNotSent inträffade')
