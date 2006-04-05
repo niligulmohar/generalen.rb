@@ -25,7 +25,7 @@ class Generalen < KomBot
   def initialize(params = {})
     super(params.merge({ :unix_user => 'generalen',
                          :client_name => 'generalen.rb',
-                         :client_version => '0.1.0',
+                         :client_version => '0.1.1',
                          :periodic_timeout => 10 }))
   end
 
