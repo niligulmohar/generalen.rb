@@ -985,8 +985,113 @@ module TextInterface
 
   def elisphack(words = nil)
     text = "Praktiska saker för elisp-klienten:\n\n"
-    text << "Bind s g till att sända ett meddelande till mig:\n"
-    text << "  (add-hook 'lyskom-mode-hook (lambda () (local-set-key [?s ?g] (lambda nil (interactive) (kom-send-message %d)))))" % $KOM_SETTINGS[:person]
+    text << ';;; Bind s g till att sända ett meddelande till mig:
+  (defun generalen-keybinding ()
+    (local-set-key [?s ?g] (lambda nil (interactive)
+  			   (set-buffer "%s")
+  			   (kom-send-message %d)
+  			   (switch-to-buffer "%s"))))
+
+  (add-hook \'lyskom-mode-hook #\'generalen-keybinding)
+
+;;; För dom vågade: ett fulhack som visar färgade kartor.
+;;; Byter buffer. Är förmodligen irriterande i vissa lägen.
+  (defgroup generalen \'() "Färgläggningsfulhack")
+  (defface generalen-map
+    \'((t (:background "darkslateblue" :foreground "white")))
+    "Grundläggande face som ärvs av, och som används på kartan där inget annat passar"
+    :group \'generalen)
+  (defface generalen-water
+    \'((t (:inherit generalen-map :foreground "slateblue" :weight bold)))
+    "Vatten"
+    :group \'generalen)
+  (defface generalen-border
+    \'((t (:inherit generalen-map :foreground "white")))
+    "Gränser"
+    :group \'generalen)
+  (defface generalen-player-1
+    \'((t (:inherit generalen-map :foreground "#a0a0ff" :weight bold)))
+    "Spelaren med tecknet #"
+    :group \'generalen)
+  (defface generalen-player-2
+    \'((t (:inherit generalen-map :foreground "red" :weight bold)))
+    "Spelaren med tecknet X"
+    :group \'generalen)
+  (defface generalen-player-3
+    \'((t (:inherit generalen-map :foreground "green2" :weight bold)))
+    "Spelaren med tecknet O"
+    :group \'generalen)
+  (defface generalen-player-4
+    \'((t (:inherit generalen-map :foreground "yellow" :weight bold)))
+    "Spelaren med tecknet %%"
+    :group \'generalen)
+  (defface generalen-player-5
+    \'((t (:inherit generalen-map :foreground "magenta" :weight bold)))
+    "Spelaren med tecknet @"
+    :group \'generalen)
+  (defface generalen-player-6
+    \'((t (:inherit generalen-map :foreground "#d08000" :weight bold)))
+    "Spelaren med tecknet ¤"
+    :group \'generalen)
+
+  (defmacro generalen-reformat (regexp face)
+    `(let (pos (start map-start))
+       (while (setq pos (string-match ,regexp message start))
+         (setq start (match-end 0))
+         (when (< pos map-end) (add-text-properties pos start \'(face ,face) message)))))
+
+  (add-hook \'lyskom-mode-hook #\'generalen-keybinding)
+  (defun generalen-reformat-map (message)
+    (remove-text-properties 0 (length message) \'(face \'foo) message)
+    (let ((map-start nil) (map-end nil))
+      (string-match "\\(.\\|\n\\)*~\n" message)
+      (setq map-end (match-end 0))
+      (setq map-start 0)
+      (generalen-reformat ".+" generalen-map)
+      (generalen-reformat "~+" generalen-water)
+      (generalen-reformat "[/_\\\\]+" generalen-border)
+      (generalen-reformat "# ?[0-9]+" generalen-player-1)
+      (generalen-reformat "X ?[0-9]+" generalen-player-2)
+      (generalen-reformat "O ?[0-9]+" generalen-player-3)
+      (setq map-start map-end)
+      (setq map-end (string-match " Länder \\[" message))
+      (when map-end
+        (generalen-reformat "^  (.)[^[\n]*" bold)
+        (generalen-reformat "(#)" generalen-player-1)
+        (generalen-reformat "(X)" generalen-player-2)
+        (generalen-reformat "(O)" generalen-player-3)
+        (generalen-reformat "(%%)" generalen-player-4)
+        (generalen-reformat "(@)" generalen-player-5)
+        (generalen-reformat "(¤)" generalen-player-6)
+        (setq map-start map-end)
+        (setq map-end (length message))
+        (generalen-reformat "#+" generalen-player-1)
+        (generalen-reformat "X+" generalen-player-2)
+        (generalen-reformat "O+" generalen-player-3)
+        (generalen-reformat "%%+" generalen-player-4)
+        (generalen-reformat "@+" generalen-player-5)
+        (generalen-reformat "¤+" generalen-player-6)
+        (generalen-reformat "\\[\\|\\]\\|-+" generalen-water))))
+
+  (defun generalen-personal-message ()
+    (when (and (eq %d (conf-stat->conf-no sender)) (string-match "^~" message))
+      (set-buffer (get-buffer-create "*generalen*"))
+      (generalen-keybinding)
+      (let ((old-point (point-max)))
+        (goto-char old-point)
+        (generalen-reformat-map message)
+        (insert message)
+        (insert "\n\n")
+        (switch-to-buffer "*generalen*")
+        (goto-char old-point)
+        (recenter 0))))
+
+  (add-hook \'kom-personal-message-hook #\'generalen-personal-message)
+
+' % [ $KOM_SETTINGS[:server],
+      $KOM_SETTINGS[:person],
+      $KOM_SETTINGS[:server],
+      $KOM_SETTINGS[:person] ]
     post text
   end
 end
