@@ -61,8 +61,8 @@ module TextInterface
 ~~~~~~~~~~\     \/ /~~~~~~~~~~\____/~~~~/____/~~__/__\/    \          /~~~~~~~~
 ~~~~~~~~~~~\ %3s  /~~~~~~~~~~~~~___~~~~~~~~~~~~/      \_____\___     /~~~~~~~~~
 ~~~~~~~~~~~~\___  \~~~~~~~~~~~~/   \_________~~\__ %3s  /       \___/_~~~~~~~~~
-~~~~~~~~~~~~~~~~\__\~~~~~~~~~~/        \     \~~_/ ____/        /     \~~~~~~~~
-~~~~~~~~~~~~~___/   \___~~~~~/   %3s    \ %3s \/   \__~\  %3s  /\ %3s /~~~~~~~~
+~~~~~~~~~~~~~~~~\__\~~~~~~~~~~/         /     \~~_/ ____/        /     \~~~~~~~~
+~~~~~~~~~~~~~___/   \___~~~~~/    %3s   \ %3s \/   \__~\  %3s  /\ %3s /~~~~~~~~
 ~~~~~~~~~~~~/    %3s   _\~~~/            \     \     /~~\     /~~\   /~~~~~~~~~
 ~~~~~~~~~~~/__________/  \~~\     _______/_____/\___/~~~~\   /~~~~\_/~~~~~~~~~~
 ~~~~~~~~~~~\     \        \~~\___/_    \      \___~~~~~~~~\_/~~~~~~__~~~~___~~~
@@ -168,8 +168,8 @@ module TextInterface
       return result if short
       parts = []
       if player.game.turn_phase == 0
-        if current and player.armies_for_placement != 0
-          parts << '%d att placera' % player.armies_for_placement
+        if current
+          parts << '%d att placera' % player.armies_for_placement if player.armies_for_placement != 0
         else
           parts << '%d att placera' % player.bonus_armies
         end
@@ -1010,7 +1010,7 @@ module TextInterface
     "Gränser"
     :group \'generalen)
   (defface generalen-player-1
-    \'((t (:inherit generalen-map :foreground "#a0a0ff" :weight bold)))
+    \'((t (:inherit generalen-map :foreground "#a0a8ff" :weight bold)))
     "Spelaren med tecknet #"
     :group \'generalen)
   (defface generalen-player-2
@@ -1044,19 +1044,19 @@ module TextInterface
   (defun generalen-reformat-map (message)
     (remove-text-properties 0 (length message) \'(face \'foo) message)
     (let ((map-start nil) (map-end nil))
-      (string-match "\\(.\\|\n\\)*~\n" message)
+      (string-match "\\\\(.\\\\|\\n\\\\)*~\\n" message)
       (setq map-end (match-end 0))
       (setq map-start 0)
       (generalen-reformat ".+" generalen-map)
       (generalen-reformat "~+" generalen-water)
-      (generalen-reformat "[/_\\\\]+" generalen-border)
+      (generalen-reformat "[/_\\\\\\\\]+" generalen-border)
       (generalen-reformat "# ?[0-9]+" generalen-player-1)
       (generalen-reformat "X ?[0-9]+" generalen-player-2)
       (generalen-reformat "O ?[0-9]+" generalen-player-3)
       (setq map-start map-end)
-      (setq map-end (string-match " Länder \\[" message))
+      (setq map-end (string-match " Länder \\\\[" message))
       (when map-end
-        (generalen-reformat "^  (.)[^[\n]*" bold)
+        (generalen-reformat "^  (.)[^[\\n]*" bold)
         (generalen-reformat "(#)" generalen-player-1)
         (generalen-reformat "(X)" generalen-player-2)
         (generalen-reformat "(O)" generalen-player-3)
@@ -1064,14 +1064,14 @@ module TextInterface
         (generalen-reformat "(@)" generalen-player-5)
         (generalen-reformat "(¤)" generalen-player-6)
         (setq map-start map-end)
-        (setq map-end (length message))
+        (setq map-end (+ 1 (string-match "\\\\]" message (string-match "Plus" message map-start))))
         (generalen-reformat "#+" generalen-player-1)
         (generalen-reformat "X+" generalen-player-2)
         (generalen-reformat "O+" generalen-player-3)
         (generalen-reformat "%%+" generalen-player-4)
         (generalen-reformat "@+" generalen-player-5)
         (generalen-reformat "¤+" generalen-player-6)
-        (generalen-reformat "\\[\\|\\]\\|-+" generalen-water))))
+        (generalen-reformat "\\\\[\\\\|\\\\]\\\\|-+" generalen-water))))
 
   (defun generalen-personal-message ()
     (when (and (eq %d (conf-stat->conf-no sender)) (string-match "^~" message))
@@ -1081,7 +1081,7 @@ module TextInterface
         (goto-char old-point)
         (generalen-reformat-map message)
         (insert message)
-        (insert "\n\n")
+        (insert "\\n\\n")
         (switch-to-buffer "*generalen*")
         (goto-char old-point)
         (recenter 0))))
