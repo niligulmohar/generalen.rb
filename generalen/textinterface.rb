@@ -52,14 +52,14 @@ module TextInterface
 ~~~~\/    \ %3s \/ %3s \~~~~~~___\  /~~\     \~~/  \ %3s \   \ %3s \  \~~/   \~
 ~~~~~\ %3s \     \     /__~~~/  // /~~~~\   _/~/    \     \   \__   \  \~\  __\\
 ~~~~~/______\____/____/  /~~~\_//  \_~~~~\_/~~/      \     \     \___\_ \~\ \~~
-~~~~/         \         /~~~~~~/ %3s \~~~____/   %3s  \___  \ %3s /    \/~/  \~
-~~~~\          \  %3s  /~~~~~~~\_____/~~/   \          /  \  \   / %3s /~/    \\
-~~~~~\    %3s   \  __  \~~~~~~~~~______/ %3s \_     __/    \__\__\    /~/ %3s /
-~~~~~~\          \/~~\__\~~~~~~~~\     \_____/ \   /~~\     \     \__ \~\   _/~
-~~~~~~~\         /~~~~~~~~~~~~~__/ %3s /        \_ \~~/ %3s /        \_\~\_/~~~
-~~~~~~~~\_______/~__~~~~~~~~~~/     __/__ %3s __/~\ \~\    /    %3s    /~~~~~~~
+~~~~/          \        /~~~~~~/ %3s \~~~____/   %3s  \___  \ %3s /    \/~/  \~
+~~~~\           \  %3s /~~~~~~~\_____/~~/   \          /  \  \   / %3s /~/    \\
+~~~~~\   %3s    /  __  \~~~~~~~~~______/ %3s \_     __/    \__\__\    /~/ %3s /
+~~~~~~\        /  /~~\__\~~~~~~~~\     \_____/ \   /~~\     \     \__ \~\   _/~
+~~~~~~~\______/__/~~~~~~~~~~~~~__/ %3s /        \_ \~~/ %3s /        \_\~\_/~~~
+~~~~~~~~\_      /~__~~~~~~~~~~/     __/__ %3s __/~\ \~\    /    %3s    /~~~~~~~
 ~~~~~~~~~~\     \/ /~~~~~~~~~~\____/~~~~/____/~~__/__\/    \          /~~~~~~~~
-~~~~~~~~~~~\  %3s /~~~~~~~~~~~~~___~~~~~~~~~~~~/      \_____\___     /~~~~~~~~~
+~~~~~~~~~~~\ %3s  /~~~~~~~~~~~~~___~~~~~~~~~~~~/      \_____\___     /~~~~~~~~~
 ~~~~~~~~~~~~\___  \~~~~~~~~~~~~/   \_________~~\__ %3s  /       \___/_~~~~~~~~~
 ~~~~~~~~~~~~~~~~\__\~~~~~~~~~~/        \     \~~_/ ____/        /     \~~~~~~~~
 ~~~~~~~~~~~~~___/   \___~~~~~/   %3s    \ %3s \/   \__~\  %3s  /\ %3s /~~~~~~~~
@@ -962,7 +962,7 @@ module TextInterface
     [ [ $state.open_games, 'Öppna spel' ],
       [ $state.running_games, 'Pågående spel' ],
       [ $state.finished_games[-3..-1], 'Nyligen avslutade spel' ] ].each do |games, caption|
-      if games and not games.empty?1
+      if games and not games.empty?
         post "%s:\n%s" % [ caption, games.collect{ |g| game_str(g) }.join("\n") ]
       end
     end
@@ -971,8 +971,9 @@ module TextInterface
   def borders(words = nil)
     result = ''
     current_game!.map.continents.each do |continent|
-      result << "--- %s (%s)\n" % [ continent.name,
-                                 continent.bonus_armies.swedish_quantity('armé', 'arméer') ]
+      result << "--- %s (%s, %s)\n" % [ continent.name,
+                                        continent.countries.length.swedish_quantity('land', 'länder', :neutrum => true),
+                                        continent.bonus_armies.swedish_quantity('bonusarmé', 'bonusarméer') ]
       continent.countries.each do |country|
         result << "  %23s: %s\n" % [ country.name,
                                            country.borders.collect{ |b| b.name }.swedish ]

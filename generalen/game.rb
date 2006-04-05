@@ -387,6 +387,9 @@ module Game
           if params[:player].mission and params[:player].mission.params[:min_armies_per_country] > 1
             maybe_end_game
           end
+          if params[:player].armies_for_movement == 0
+            advance_turn
+          end
         end
       end
     end
