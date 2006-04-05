@@ -174,10 +174,12 @@ module TextInterface
         parts << '%d att flytta' % player.armies_for_movement
       end
       result << ' [%s]' % parts.join(', ') unless parts.empty?
-    elsif not player.game.first_placement_done and current
-      result << ' [%d att placera]' % player.armies_for_placement
     elsif not player.game.first_placement_done and player.game.in_turn(player.person)
-      result << ' [ska placera arméer]'
+      if current
+        result << ' [%d att placera]' % player.armies_for_placement
+      else
+        result << ' [Ska placera arméer]'
+      end
     end
     if player.game.open and player.ready
       result << ' [Redo att börja]'
@@ -956,10 +958,24 @@ module TextInterface
     [ [ $state.open_games, 'Öppna spel' ],
       [ $state.running_games, 'Pågående spel' ],
       [ $state.finished_games[-3..-1], 'Nyligen avslutade spel' ] ].each do |games, caption|
-      if games and not games.empty?
+      if games and not games.empty?1
         post "%s:\n%s" % [ caption, games.collect{ |g| game_str(g) }.join("\n") ]
       end
     end
+  end
+
+  def borders(words = nil)
+    result = ''
+    current_game!.map.continents.each do |continent|
+      result << "--- %s (%s)\n" % [ continent.name,
+                                 continent.bonus_armies.swedish_quantity('armé', 'arméer') ]
+      continent.countries.each do |country|
+        result << "  %23s: %s\n" % [ country.name,
+                                           country.borders.collect{ |b| b.name }.swedish ]
+      end
+      result << "\n"
+    end
+    post result
   end
 
   def elisphack(words = nil)
