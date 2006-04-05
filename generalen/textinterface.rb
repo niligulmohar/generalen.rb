@@ -167,8 +167,12 @@ module TextInterface
       result << ' [I tur]'
       return result if short
       parts = []
-      if current and player.armies_for_placement != 0
-        parts << '%d att placera' % player.armies_for_placement
+      if player.game.turn_phase == 0
+        if current and player.armies_for_placement != 0
+          parts << '%d att placera' % player.armies_for_placement
+        else
+          parts << '%d att placera' % player.bonus_armies
+        end
       end
       if player.armies_for_movement != 0
         parts << '%d att flytta' % player.armies_for_movement
