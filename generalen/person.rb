@@ -1,3 +1,7 @@
+#--
+# Copyright (c) Nicklas Lindgren 2005-2006
+# Det här programmet distribueras under villkoren i GPL v2.
+#++
 require 'generalen/textinterface'
 
 module Person

@@ -1,4 +1,8 @@
 #! /usr/bin/env ruby
+#--
+# Copyright (c) Nicklas Lindgren 2005-2006
+# Det här programmet distribueras under villkoren i GPL v2.
+#++
 
 require 'generalen/state'
 require 'generalen/game'

@@ -1,4 +1,8 @@
 # -*- coding: iso-8859-1 -*-
+#--
+# Copyright (c) Nicklas Lindgren 2005-2006
+# Det här programmet distribueras under villkoren i GPL v2.
+#++
 
 require 'forwardable'
 require 'observer'
