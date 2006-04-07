@@ -89,9 +89,6 @@ $logger.info('started')
 
 Backup::with_rotation(STATE_FILE_NAME)
 $state = State.new(STATE_FILE_NAME, Random::Source.new)
-$state.register_person(:Test, Person::TestPerson, 'Test')
-$state.register_person(:Ap, Person::TestPerson, 'Ap')
-
 
 # Thread.abort_on_exception = true
 

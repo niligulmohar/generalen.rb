@@ -22,12 +22,13 @@ class State
     @store = PStore.new(filename)
     @store.transaction do
       unless @store[:inited]
-        @store[:people] = ({ :admin => Person::Administrator.new })
+        @store[:people] = ({ :admin => Person::Administrator.new,
+                             :Test => Person::TestPerson.new('Test'),
+                             :Ap => Person::TestPerson.new('Ap') })
         @store[:games] = []
         @store[:last_game_number] = 0
         @store[:inited] = true
         @store[:random] = random_source
-        @store
       end
     end
   end
