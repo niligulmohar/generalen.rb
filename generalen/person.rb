@@ -95,7 +95,6 @@ module Person
         end
         send_message(acc) unless acc.empty?
       rescue Kom::MessageNotSent
-        puts "Trasigt"
         $logger.error('Kom::MessageNotSent inträffade')
       else
         @map_message = nil
