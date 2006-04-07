@@ -130,7 +130,7 @@ module Game
       first_placement_done and active
     end
     def in_turn(person)
-      if not @started
+      if not @started or @ended
         false
       elsif first_placement
         not @people_players[person].first_placement_done
