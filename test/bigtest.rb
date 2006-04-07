@@ -70,7 +70,7 @@ class BigTestCase < Test::Unit::TestCase
     end
   end
 
-  def test_create_settings_start_surrender
+  def test_create_settings_start_twoplayer_surrender
     $state.with_person(:Pelle) do |p|
       p.command('ny')
       assert_match( /Du har skapat Första partiet/, p.get )
@@ -118,6 +118,7 @@ class BigTestCase < Test::Unit::TestCase
     $state.with_random_source do |r|
       r.choose_results.push([1, 0])
       r.choose_results.push(*((0..41).collect.reverse.collect{ |n| [n] }))
+      r.randrange_results.push(4, 5, 6, 1, 2)
     end
     $state.with_person(:Pelle) do |p|
       assert_match( /en minut/, p.get )
@@ -128,19 +129,43 @@ class BigTestCase < Test::Unit::TestCase
       assert_match( /Pelle är redo/, p.get )
       assert_match( /Första partiet har börjat!/, p.get )
       assert_match( /Turordningen.*Svenzuno.*Pelle/m, p.get )
-      assert_match( /Du tilldelas 21 länder.*Du har nitton arméer/m, p.get )
+      assert_match( /Du tilldelas fjorton länder.*Du har 26 arméer/m, p.get )
+      p.command('karta')
+      assert_match( /~/, p.get )
+      p.command('pl 3 ö a 3 arg 3 indo 3 bra 3 sia 3 norda 3 kin västeu 3 v f 2')
+      assert_match( /Du har placerat/, p.get )
+      assert_match( /Säg "klar"/, p.get )
+      p.command('kl')
+      assert_match( /Pelle är klar/, p.get )
+      assert_match( /Väntar på.*Svenzuno/m, p.get )
     end
     $state.with_person(:Svenzuno) do |p|
       assert_match( /Pelle är redo/, p.get )
       assert_match( /Första partiet har börjat!/, p.get )
       assert_match( /Turordningen.*Svenzuno.*Pelle/m, p.get )
-      assert_match( /Du tilldelas 21 länder.*Du har nitton arméer/m, p.get )
+      assert_match( /Du tilldelas fjorton länder.*Du har 26 arméer/m, p.get )
+      assert_match( /Pelle är klar/, p.get )
+      assert_match( /Väntar på.*Svenzuno/m, p.get )
+      p.command('pl v a 3 mada 3 kon 3 per 3 indi 3 mel 3 sydeu 3 jap 3 mon 2')
+      assert_match( /Du har placerat/, p.get )
+      assert_match( /Säg "klar"/, p.get )
+      p.command('kl')
+      assert_match( /Svenzuno är klar/, p.get )
+      assert_match( /Det är din tur/, p.get )
+      assert_match( /Du får inga arméer första rundan/, p.get )
+      p.command('anf n g från v a med 3')
+      assert_match( /Svenzuno.*anfaller.*Neutral.*6...5...4.*2...1/m, p.get )
+      assert_match( /Svenzuno erövrar Nya Guinea/m, p.get )
       p.command('kap!')
       assert_match( /Svenzuno har kapitulerat/, p.get )
       assert_match( /Pelle har vunnit/, p.get )
       assert_nil( p.get )
     end
     $state.with_person(:Pelle) do |p|
+      assert_match( /Svenzuno är klar/, p.get )
+      assert_match( /Turen övergår till Svenzuno/, p.get )
+      assert_match( /Svenzuno.*anfaller.*Neutral.*6...5...4.*2...1/m, p.get )
+      assert_match( /Svenzuno erövrar Nya Guinea/m, p.get )
       assert_match( /Svenzuno har kapitulerat/, p.get )
       assert_match( /Pelle har vunnit/, p.get )
       assert_nil( p.get )
@@ -474,14 +499,14 @@ class BigTestCase < Test::Unit::TestCase
       assert_match( /Pelle är redo/, p.get )
       assert_match( /Första partiet har börjat!/, p.get )
       assert_match( /Turordningen.*Pelle.*Stina/m, p.get )
-      assert_match( /Du tilldelas 21 länder.*Du har nitton arméer/m, p.get )
+      assert_match( /Du tilldelas fjorton länder.*Du har 26 arméer/m, p.get )
     end
     # Byte från öppet parti till parti där första placering börjar
     $state.with_person(:Stina) do |p|
       assert_match( /Pelle är redo/, p.get )
       assert_match( /Första partiet har börjat!/, p.get )
       assert_match( /Turordningen.*Pelle.*Stina/m, p.get )
-      assert_match( /Du tilldelas 21 länder.*Du har nitton arméer/m, p.get )
+      assert_match( /Du tilldelas fjorton länder.*Du har 26 arméer/m, p.get )
       assert_match( /Du är nu aktiv i Första partiet/, p.get )
     end
     $state.with_person(:Pelle) do |p|
@@ -491,19 +516,20 @@ class BigTestCase < Test::Unit::TestCase
       assert_match( /Pelle är redo/, p.get )
       assert_match( /Andra partiet har börjat!/, p.get )
       assert_match( /Turordningen.*Pelle.*Stina/m, p.get )
-      assert_match( /Du tilldelas 21 länder.*Du har nitton arméer/m, p.get )
+      assert_match( /Du tilldelas fjorton länder.*Du har 26 arméer/m, p.get )
     end
     # Inget byte från ett parti där första placeringen pågår
     $state.with_person(:Stina) do |p|
       assert_match( /Pelle är redo/, p.get )
       assert_match( /Andra partiet har börjat!/, p.get )
       assert_match( /Turordningen.*Pelle.*Stina/m, p.get )
-      assert_match( /Du tilldelas 21 länder.*Du har nitton arméer/m, p.get )
+      assert_match( /Du tilldelas fjorton länder.*Du har 26 arméer/m, p.get )
       assert_nil( p.get )
     end
     # Byte till ett parti där första placeringen pågår, när man är klar
     $state.with_person(:Stina) do |p|
-      p.command('pla 3 ö a 3 syda 3 mada 3 indo 3 östa 2 peru 2 sia')
+      p.command('pl 3 ö a 3 arg 3 indo 3 bra 3 sia 3 norda 3 kin västeu 3 v f 2')
+      #p.command('pla 3 ö a 3 syda 3 mada 3 indo 3 östa 2 peru 2 sia')
       assert_match( /Du har placerat/, p.get )
       assert_match( /Säg "klar"/, p.get )
       p.command('kl')
@@ -512,7 +538,8 @@ class BigTestCase < Test::Unit::TestCase
       assert_match( /Du är nu aktiv i Andra partiet/, p.get )
     end
     $state.with_person(:Stina) do |p|
-      p.command('pla 3 ö a 3 syda 3 mada 3 indo 3 östa 2 peru 2 sia')
+      p.command('pl 3 ö a 3 arg 3 indo 3 bra 3 sia 3 norda 3 kin västeu 3 v f 2')
+      #p.command('pla 3 ö a 3 syda 3 mada 3 indo 3 östa 2 peru 2 sia')
       assert_match( /Du har placerat/, p.get )
       assert_match( /Säg "klar"/, p.get )
       p.command('kl')

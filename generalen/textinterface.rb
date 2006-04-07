@@ -100,10 +100,10 @@ module TextInterface
                                    [' ? '] * map.countries.length
                                  else
                                    map.countries.collect do |c|
-                                     INITIALS[c.owner.number] +
-                                       if c.owner.person != self and not map.game.first_placement_done
+                                     (c.owner ? INITIALS[c.owner.number] : '-') +
+                                       if c.owner && c.owner.person != self and not map.game.first_placement_done
                                          ' ?'
-                                       elsif c.owner.person != self
+                                       elsif c.owner && c.owner.person != self
                                          '%2d' % c.armies
                                        else
                                          '%2d' % c.total_armies
@@ -416,7 +416,7 @@ module TextInterface
                                                                                           params[:from].name,
                                                                                           params[:from].owner.person.name,
                                                                                           params[:target].name,
-                                                                                          params[:target].owner.person.name ])
+                                                                                          params[:target].owner ? params[:target].owner.person.name : 'Neutral' ])
         message << "   Anfall: %s\n  Försvar: %s\n\n" % ([ dice_text(params[:attack]),
                                                            dice_text(params[:defence]) ])
         message << "%23s: %2d - %2d = %2d\n%23s: %2d - %2d = %2d" % ([ params[:from].name,

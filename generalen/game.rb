@@ -231,7 +231,9 @@ module Game
       changed
       notify_observers(:surrender, :person => params[:person])
       maybe_end_game
-      advance_turn if advance_turn_afterwards
+      unless @ended
+        advance_turn if advance_turn_afterwards
+      end
     end
 
     def say(params = {})
@@ -347,7 +349,7 @@ module Game
             params[:player].card_earned = true
             changed
             notify_observers(:conquer, params)
-            if loser.countries.empty?
+            if loser && loser.countries.empty?
               params[:player].has_defeated << loser
               @turn_queue.delete(loser)
               changed
@@ -437,13 +439,15 @@ module Game
       end
       countries = @map.countries.clone
       catch :countries_empty do
+        assign_queue = @turn_queue.clone
+        assign_queue.unshift(nil) if @turn_queue.length < 3
         loop do
-          @turn_queue.reverse.each do |player|
+          assign_queue.reverse.each do |player|
             country = @random.choose_n_from(1, countries).first
             countries.delete(country)
             country.owner = player
-            country.armies = 1
-            player.armies_for_placement -= 1
+            country.armies = (if player then 1 else 2 end)
+            player.armies_for_placement -= 1 if player
             throw :countries_empty if countries.empty?
           end
         end
@@ -477,7 +481,7 @@ module Game
     def make_placements_permanent
       placements = {}
       @map.countries.each do |c|
-        if c.owner.armies_for_placement >= 0
+        if c.owner && c.owner.armies_for_placement >= 0
           c.armies += c.placed_armies
           placements[c] = c.placed_armies if c.placed_armies > 0
         end
