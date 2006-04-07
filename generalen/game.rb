@@ -762,6 +762,8 @@ module Game
           if not @player.has_defeated.include?(params[:kill_player])
             return completed?(@fallback_params)
           end
+        else
+          return false
         end
       end
       if not params[:continents].empty?
