@@ -112,7 +112,7 @@ module Game
     PERSON_REQUESTS = ([ :join ])
 
     def open
-      not @started or @ended
+      not (@started or @ended)
     end
     def finished
       @ended and @started
@@ -352,8 +352,8 @@ module Game
                 params[:player].cards[c] += loser.cards[c]
                 loser.cards[c] = 0
               end
-              maybe_end_game
             end
+            maybe_end_game
           end
         end
       end
@@ -459,10 +459,12 @@ module Game
     def maybe_end_game
       if first_placement_done and @turn_queue.first != :new_round and @turn_queue.first.mission and @turn_queue.first.mission.completed?
         changed
+        @turn_queue.first.winner = true
         notify_observers(:winner, :person => @turn_queue.first.person)
         end_game
       elsif active_players.length == 1
         changed
+        active_players.first.winner = true
         notify_observers(:winner, :person => active_players.first.person)
         end_game
       end
