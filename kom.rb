@@ -1931,7 +1931,11 @@ module Kom
         begin
           data = @socket.sysread(wanted)
         rescue SystemCallError => e
-          retry if e.errno == Errno::EINTR::Errno
+          if e.errno == Errno::EINTR::Errno
+            retry
+          else
+            raise
+          end
         end
         if data.length == 0
           raise ReceiveError
