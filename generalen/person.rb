@@ -21,6 +21,8 @@ module Person
       @current_game = nil
       @games = OrderedHash.new
       @messages = []
+      @delayed_messages = {}
+      @quiet = false
       super
     end
     def post_map_message(message)
@@ -28,6 +30,25 @@ module Person
     end
     def post(message)
       @messages << message
+    end
+    def post_delayed(key, message)
+      @delayed_messages ||= {}
+      @delayed_messages[key] ||= []
+      @delayed_messages[key] << message
+    end
+    def post_maybe_delayed(key, message, delayed = true)
+      if @quiet and delayed
+        post_delayed(key, message)
+      else
+        post(message)
+      end
+    end
+    def flush_delayed(key)
+      @delayed_messages ||= {}
+      if @delayed_messages[key] and not @delayed_messages[key].empty?
+        @messages += @delayed_messages[key]
+        @delayed_messages[key] = nil
+      end
     end
     def messages
       @map_message ? [@map_message] + @messages : @messages

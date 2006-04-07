@@ -61,7 +61,7 @@ module TextInterface
 ~~~~~~~~~~\     \/ /~~~~~~~~~~\____/~~~~/____/~~__/__\/    \          /~~~~~~~~
 ~~~~~~~~~~~\ %3s  /~~~~~~~~~~~~~___~~~~~~~~~~~~/      \_____\___     /~~~~~~~~~
 ~~~~~~~~~~~~\___  \~~~~~~~~~~~~/   \_________~~\__ %3s  /       \___/_~~~~~~~~~
-~~~~~~~~~~~~~~~~\__\~~~~~~~~~~/         /     \~~_/ ____/        /     \~~~~~~~~
+~~~~~~~~~~~~~~~~\__\~~~~~~~~~~/         /    \~~_/ ____/        /     \~~~~~~~~
 ~~~~~~~~~~~~~___/   \___~~~~~/    %3s   \ %3s \/   \__~\  %3s  /\ %3s /~~~~~~~~
 ~~~~~~~~~~~~/    %3s   _\~~~/            \     \     /~~\     /~~\   /~~~~~~~~~
 ~~~~~~~~~~~/__________/  \~~\     _______/_____/\___/~~~~\   /~~~~\_/~~~~~~~~~~
@@ -111,7 +111,7 @@ module TextInterface
           result << "  (%s) %s%s\n" % ([ INITIALS[player.number],
                                          player.name,
                                          player_info_str(player, player.person == self) ])
-          result << "    %s, %s%s (%s)\n" % ([ cards_str(player.cards, true),
+          result << "    %s, %s%s (%s)\n" % ([ cards_str(player.cards, !player.game.finished),
                                                player.countries.length.swedish_quantity('land', 'länder', :neutrum => true),
                                                continents_str(player.continents),
                                                armies_str(player) ])
@@ -127,10 +127,10 @@ module TextInterface
           remaining = total_pluses - plus_distribution.inject(0){ |acc, p| acc + p.last }
           plus_distribution << ['-', remaining]
 
-          result << ' '*8 + (['.']*5).join(' '*16) + "\n"
-          result << " Länder [%s]\n" % distribution_graph(country_distribution, 67)
-          result << " Arméer [%s]\n" % distribution_graph(army_distribution, 67)
-          result << '   Plus [%s]' % distribution_graph(plus_distribution, 67)
+          result << ' '*9 + (['.']*5).join(' '*16) + "\n"
+          result << " Länder [%s]\n" % distribution_graph(country_distribution, 69)
+          result << " Arméer [%s]\n" % distribution_graph(army_distribution, 69)
+          result << '   Plus [%s]' % distribution_graph(plus_distribution, 69)
         end
         return result
       end
@@ -138,7 +138,7 @@ module TextInterface
   end
 
   def deadline_str(game)
-    if game.turn_deadline
+    if game.turn_deadline and not game.finished
       remaining = game.turn_deadline - Time.now
       return ' [%s]' % (if remaining <= 0
                           'Deadline passerad!'
@@ -163,7 +163,7 @@ module TextInterface
     elsif player.loser
       result << ' [Besegrad]'
     end
-    if player.game.in_turn(player.person) and player.game.first_placement_done
+    if player.game.in_turn(player.person) and player.game.first_placement_done and not player.game.finished
       result << ' [I tur]'
       return result if short
       parts = []
@@ -338,9 +338,9 @@ module TextInterface
           @person.go_to_impl(@game)
         end
       when :surrender
-        @person.post('%s har kapitulerat i %s!' % [ params[:person].name, @game.name ])
+        @person.post('--- %s har kapitulerat i %s! ---' % [ params[:person].name, @game.name ])
       when :defeated
-        @person.post('%s är besegrad i %s!' % [ params[:person].name, @game.name ])
+        @person.post('--- %s är besegrad i %s! ---' % [ params[:person].name, @game.name ])
         if params[:n_cards]
           if params[:by_person] == @person
             @person.post('Du övertar följande kort: %s' % cards_str(params[:cards]))
@@ -349,7 +349,8 @@ module TextInterface
           end
         end
       when :winner
-        @person.post('%s har vunnit %s!' % [ params[:person].name, @game.name ])
+        @person.flush_delayed(@game)
+        @person.post('--- %s har vunnit %s! ---' % [ params[:person].name, @game.name ])
         @end_announced = true
       when :say
         @person.post("%s [%s]:\n%s" % [ params[:person].name, @game.name, params[:text] ])
@@ -358,6 +359,8 @@ module TextInterface
                                                       @game.name ]))
       when :turn_change
         if params[:to_person] == @person
+          @person.flush_delayed(@game)
+          @person.post_map(@game)
           @person.post('*** Det är din tur i %s! ***' % @game.name)
           @last_attack = nil
           @last_move = nil
@@ -373,29 +376,33 @@ module TextInterface
             @person.go_to_impl(@game)
           end
         else
-          @person.post('Turen övergår till %s i %s.' % [ params[:to_person].name, @game.name ])
+          message = 'Turen övergår till %s i %s.' % [ params[:to_person].name, @game.name ]
           if params[:from_person] == @person
+            @person.post_map(@game)
             maybe_auto_switch_game
+            @person.post(message)
+          else
+            @person.post_maybe_delayed(@game, message)
           end
         end
       when :cards
+        @person.post_map(@game) if params[:player] == player
         message = "%s:\n%s får %s för följande kort: %s" % ([ @game.name,
                                                               params[:person].name,
                                                               params[:armies].swedish_quantity('extra armé', 'extra arméer'),
                                                               @person.cards_str(params[:cards]) ])
-        @person.post(message)
+        @person.post_maybe_delayed(@game, message, params[:player] != player)
       when :place
         if not params[:placements].empty?
-          if params[:person] != @person
-            @person.post_map(@game)
-          end
+          @person.post_map(@game) if params[:player] == player
           message = "%s:\n  %s placerar ut följande arméer:\n" % [ @game.name, params[:person].name ]
           message << params[:placements].sort.collect do |country, armies|
             '%23s %2d + %2d = %2d' % [ country.name, country.armies - armies, armies, country.armies ]
           end.join("\n")
-          @person.post(message)
+          @person.post_maybe_delayed(@game, message, params[:person] != @person)
         end
       when :attack
+        @person.post_map(@game) if params[:player] == player
         message = "%s:\n  %23s - %s\n                     anfaller\n  %23s - %s\n\n" % ([ @game.name,
                                                                                           params[:from].name,
                                                                                           params[:from].owner.person.name,
@@ -411,9 +418,9 @@ module TextInterface
                                                                        params[:target].armies + params[:defender_losses],
                                                                        params[:defender_losses],
                                                                        params[:target].armies ])
-        @person.post(message)
+        @person.post_maybe_delayed(@game, message, params[:player] != player)
       when :conquer
-        @person.post_map(@game)
+        @person.post_map(@game) if params[:player] == player
         message = "%s erövrar %s!\n\n" % [ params[:target].owner.person.name, params[:target].name ]
         message << "%23s: %2d - %2d = %2d\n%23s: %2d + %2d = %2d" % ([ params[:from].name,
                                                                        params[:from].armies + params[:armies],
@@ -423,9 +430,9 @@ module TextInterface
                                                                        0,
                                                                        params[:armies],
                                                                        params[:target].armies ])
-        @person.post(message)
+        @person.post_maybe_delayed(@game, message, params[:player] != player)
       when :move
-        #@person.post_map(@game)
+        @person.post_map(@game) if params[:player] == player
         message = "%s:\n  %s flyttar %s från %s till  %s.\n\n" % ([ @game.name,
                                                                     params[:to].owner.person.name,
                                                                     params[:armies].swedish_quantity('armé', 'arméer'),
@@ -439,12 +446,12 @@ module TextInterface
                                                                        params[:to].armies - params[:armies],
                                                                        params[:armies],
                                                                        params[:to].armies ])
-        @person.post(message)
+        @person.post_maybe_delayed(@game, message, params[:player] != player)
       when :card
         if params[:to_player].person == @person
           @person.post('Du får ett kort: [%s]' % params[:to_player].last_card.to_s.upcase)
         else
-          @person.post('%s får ett kort.' % params[:to_player].person.name)
+          @person.post_maybe_delayed(@game, '%s får ett kort.' % params[:to_player].person.name)
         end
       else
         raise ArgumentError.new('Uknown GameObserver message')
@@ -473,6 +480,11 @@ module TextInterface
                 ['administrera', 'starta'] => :start,
                 ['administrera', 'stoppa'] => :stop,
                 ['administrera', 'skjut', 'upp', 'deadlines'] => :push_deadlines,
+                ['pratig'] => :verbose,
+                ['var', 'pratig'] => :verbose,
+                ['smygig'] => :quiet,
+                ['var', 'smygig'] => :quiet,
+                ['svordom'] => :unimplemented,
 
                 ['elisphack'] => :elisphack,
                 ['status'] => :status,
@@ -539,7 +551,9 @@ module TextInterface
                  "elisphack",
                  "gå till [SPEL]",
                  "inställningar",
-                 "sätt NAMN [= VÄRDE]" ]).sort
+                 "sätt NAMN [= VÄRDE]",
+                 "var smygig",
+                 "var pratig" ]).sort
     text << phrases.column_list_view
     text << "\nNamn och fraser går att kom-förkorta varhelst man vill."
     text << "\n\nFramför klagomål till <person 9023: Nicklas Lindgren (Äter mopeder, öppnar kasino)>\n\nGurk. Ost."
@@ -961,11 +975,25 @@ module TextInterface
     end
     [ [ $state.open_games, 'Öppna spel' ],
       [ $state.running_games, 'Pågående spel' ],
-      [ $state.finished_games[-3..-1], 'Nyligen avslutade spel' ] ].each do |games, caption|
+      [ $state.finished_games.reverse[0..2], 'Nyligen avslutade spel' ] ].each do |games, caption|
       if games and not games.empty?
         post "%s:\n%s" % [ caption, games.collect{ |g| game_str(g) }.join("\n") ]
       end
     end
+  end
+
+  def unimplemented(words = nil)
+    post "Just nu förstår jag inte vad du menar. Men det blir nog bättre med tiden."
+  end
+
+  def verbose(words = nil)
+    @quiet = false
+    post 'Nu får du meddelanden så fort något händer i ett parti där du deltar! Säg "var smygig" om du vill ändra det.'
+  end
+
+  def quiet(words = nil)
+    @quiet = true
+    post 'Nu får du bara meddelanden i partier där det är din tur. Säg "var pratig" om du vill ändra det.'
   end
 
   def borders(words = nil)
