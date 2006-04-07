@@ -1,3 +1,11 @@
+# -*- coding: iso-8859-1 -*-
+#
+# Den här filen har kompilerats från kom.py ur python-lyskom.
+#
+# LysKOM Protocol A version 10/11 client interface for Python
+# $Id: kom.py,v 1.40 2004/07/18 19:58:24 astrand Exp $
+# (C) 1999-2002 Kent Engström. Released under GPL.
+
 require 'socket'
 module Kom
   WHITESPACE = " \t\r\n"
