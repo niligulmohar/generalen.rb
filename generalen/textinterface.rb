@@ -261,6 +261,11 @@ module TextInterface
         end
       end
     end
+    def maybe_prompt_for_history
+      if @person.has_delayed?(@game)
+        @person.post 'Skriv "resumé" om du vill veta vad som hänt.'
+      end
+    end
     def maybe_auto_switch_game
       in_turn_game = @person.games.values.detect{ |g| g.game.in_turn(@person) }
       if in_turn_game
@@ -353,8 +358,8 @@ module TextInterface
           end
         end
       when :winner
-        @person.flush_delayed(@game)
         @person.post('--- %s har vunnit %s! ---' % [ params[:person].name, @game.name ])
+        maybe_prompt_for_history
         @end_announced = true
       when :say
         @person.post("%s [%s]:\n%s" % [ params[:person].name, @game.name, params[:text] ])
@@ -363,9 +368,9 @@ module TextInterface
                                                       @game.name ]))
       when :turn_change
         if params[:to_person] == @person
-          @person.flush_delayed(@game)
           @person.post_map(@game)
           @person.post('*** Det är din tur i %s! ***' % @game.name)
+          maybe_prompt_for_history
           @last_attack = nil
           @last_move = nil
           if player.armies_for_placement > 0
@@ -488,6 +493,8 @@ module TextInterface
                 ['var', 'pratig'] => :verbose,
                 ['smygig'] => :quiet,
                 ['var', 'smygig'] => :quiet,
+                ['resumé'] => :history,
+                ['resume'] => :history,
                 ['svordom'] => :unimplemented,
 
                 ['elisphack'] => :elisphack,
@@ -557,7 +564,8 @@ module TextInterface
                  "inställningar",
                  "sätt NAMN [= VÄRDE]",
                  "var smygig",
-                 "var pratig" ]).sort
+                 "var pratig",
+                 "resumé [i brev]" ]).sort
     text << phrases.column_list_view
     text << "\nNamn och fraser går att kom-förkorta varhelst man vill."
     text << "\n\nFramför klagomål till <person 9023: Nicklas Lindgren (Äter mopeder, öppnar kasino)>\n\nGurk. Ost."
@@ -998,6 +1006,21 @@ module TextInterface
   def quiet(words = nil)
     @quiet = true
     post 'Nu får du bara meddelanden i partier där det är din tur. Säg "var pratig" om du vill ändra det.'
+  end
+
+  def history(words = [])
+    unless words.empty?
+      post 'För närvarande kan du bara få en resumé som personligt meddelande.'
+    else
+      if has_delayed?(current_game!)
+        flush_delayed(current_game!)
+      else
+        post 'Ingenting har hänt i %s som du inte hört om.' % @current_game.name
+        unless @quiet
+          post 'Den här finessen kan vara anändbar om du har sagt "var smygig".'
+        end
+      end
+    end
   end
 
   def borders(words = nil)

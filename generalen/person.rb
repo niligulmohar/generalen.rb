@@ -47,9 +47,12 @@ module Person
         post(message)
       end
     end
+    def has_delayed?(key)
+      @delayed_messages[key] and not @delayed_messages[key].empty?
+    end
     def flush_delayed(key)
       @delayed_messages ||= {}
-      if @delayed_messages[key] and not @delayed_messages[key].empty?
+      if has_delayed?(key)
         @messages += @delayed_messages[key]
         @delayed_messages[key] = nil
       end
