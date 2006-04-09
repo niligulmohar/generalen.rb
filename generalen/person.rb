@@ -139,6 +139,9 @@ module Person
     def name
       @name
     end
+    def clear_messages
+      @messages.clear
+    end
     def flush
       # puts @messages.join("\n\n")
       # @messages.clear

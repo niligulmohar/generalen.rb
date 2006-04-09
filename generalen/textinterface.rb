@@ -220,7 +220,7 @@ module TextInterface
     total = segments.inject(0){ |acc, seg| acc + seg.last }
     result = ''
     segments.each do |character, value|
-      result << character * (width * value).quo(total).round
+      result << character * (width * value).quo(total).round if value > 0
     end
     if result.length < width
       result << segments.last.first * (width - result.length)
@@ -350,11 +350,11 @@ module TextInterface
         @person.post('--- %s har kapitulerat i %s! ---' % [ params[:person].name, @game.name ])
       when :defeated
         @person.post('--- %s är besegrad i %s! ---' % [ params[:person].name, @game.name ])
-        if params[:n_cards]
+        if params[:n_cards] and params[:n_cards] > 0
           if params[:by_person] == @person
-            @person.post('Du övertar följande kort: %s' % cards_str(params[:cards]))
+            @person.post('Du övertar följande kort: %s' % @person.cards_str(params[:cards]))
           else
-            @person.post('%s övertar %s.' % params[:n_cards].swedish_quantity('kort', 'kort', :neutrum => true))
+            @person.post('%s övertar %s.' % [ params[:by_person].name, params[:n_cards].swedish_quantity('kort', 'kort', :neutrum => true) ])
           end
         end
       when :winner

@@ -111,7 +111,7 @@ module Game
       return result
     end
 
-    ADMIN_REQUESTS = ([ :timeout_poll ])
+    ADMIN_REQUESTS = ([ :timeout_poll, :set_turn_queue ])
     PLAYER_REQUESTS = ([ :leave, :set, :ready, :surrender, :say, :place, :done, :attack, :move, :cards ])
     PERSON_REQUESTS = ([ :join ])
 
@@ -156,6 +156,23 @@ module Game
         return true
       else
         return false
+      end
+    end
+
+    def set_turn_queue(params = {})
+      make_placements_permanent
+      reset_moved_armies
+      @round = 1 if @round == 0
+      @turn_queue = params[:names].collect do |name|
+        players.select{ |p| p.person.name == name.to_s }.first
+      end
+      @turn_queue << :new_round
+      @turn_queue.first.armies_for_movement = 7
+      players.each do |p|
+        p.armies_for_placement = 0
+      end
+      if params[:armies_for_placement]
+        @turn_queue.first.armies_for_placement = params[:armies_for_placement]
       end
     end
 
