@@ -367,6 +367,7 @@ module Game
             changed
             notify_observers(:conquer, params)
             if loser && loser.countries.empty?
+              loser.loser = true
               params[:player].has_defeated << loser
               @turn_queue.delete(loser)
               changed
@@ -567,7 +568,7 @@ module Game
     def advance_turn_phase(to_phase)
       if @turn_phase > to_phase or (to_phase > 0 and @turn_queue.first.armies_for_placement != 0)
         raise TurnPhaseException.new(:from => @turn_phase, :to => to_phase)
-      elsif @turn_queue.first.total_cards >= 5 and to_phase > 0
+      elsif @turn_queue.first.total_cards >= 5 and @turn_phase == 0 and to_phase > 0
         raise TooManyCardsException.new
       else
         @turn_phase = to_phase
@@ -609,6 +610,7 @@ module Game
       @game.map.countries.select{ |c| c.owner == self }
     end
     def bonus_armies
+      return 0 if countries.length == 0
       armies = [countries.length / 3, 3].max
       continents.each do |c|
         armies += c.bonus_armies
