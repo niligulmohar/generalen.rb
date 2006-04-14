@@ -845,6 +845,14 @@ class BigTestCase < Test::Unit::TestCase
 ~~~~~~~~~~~~\     /~~~~~~~~~~~~~~~~~~~~~\    /~~~~~~~~~~~~~~~~\      /  X 1  /~
 ~~~~~~~~~~~~~\___/~~~~~~~~~~~~~~~~~~~~~~~\__/~~~~~~~~~~~~~~~~~/_____/_______/~~')
     $state.with_person(players.first) do |p|
+      p.command('placera 2 i ukraina')
+    end
+    $state.with_first_game do |g|
+      assert(! g.players.first.winner)
+      assert(! g.finished)
+    end
+    $state.with_person(players.first) do |p|
+      p.command('placera -2 i ukraina')
       p.command('placera 1 i ukraina')
     end
     $state.with_first_game do |g|
@@ -949,6 +957,10 @@ class BigTestCase < Test::Unit::TestCase
       assert_match( /Pelle erövrar Ukraina/m, p.get )
       assert_match( /Olle är besegrad/m, p.get )
       assert_match( /Du övertar följande kort.*A.*A/m, p.get )
+      p.command('kort')
+      assert_match( /exempel/, p.get )
+      assert_match( /.A. .A./, p.get )
+      assert_match( /uppdrag/, p.get )
       p.command('klar')
       assert_match( /Du får ett kort.*A/, p.get )
       assert_match( /Turen övergår till Kalle/, p.get )
