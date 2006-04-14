@@ -80,6 +80,7 @@ end
 $KOM_SETTINGS = ({ :server => 'kom.lysator.liu.se',
                    :person => 12668,
                    :password => '64llob' })
+$WEB_SETTINGS = ({ :base_url => 'http://solvalou.outherlimits.org/g/'})
 STATE_FILE_NAME = 'GENERALEN.STATE'
 LOG_FILE_NAME = 'GENERALEN.LOG'
 ADMIN_PERSON = 9023
@@ -93,14 +94,16 @@ $state = State.new(STATE_FILE_NAME, Random::Source.new)
 # Thread.abort_on_exception = true
 
 begin
-  kom_thread = Thread.new do
-    begin
-      $kombot = Generalen.new($KOM_SETTINGS)
-      $kombot.run
-    rescue Interrupt
-    rescue Exception => e
-      puts e
-      puts e.backtrace
+  if ARGV.empty?
+    kom_thread = Thread.new do
+      begin
+        $kombot = Generalen.new($KOM_SETTINGS)
+        $kombot.run
+      rescue Interrupt
+      rescue Exception => e
+        puts e
+        puts e.backtrace
+      end
     end
   end
 
@@ -126,7 +129,7 @@ begin
 
   loop do
     begin
-      cmd = read((if $kombot.running? then '-!-' else '---' end) + ' generalen> ')
+      cmd = read((if $kombot && $kombot.running? then '-!-' else '---' end) + ' generalen> ')
       if not cmd
         puts
         break
@@ -158,7 +161,7 @@ rescue Interrupt
   puts
 ensure
   $shutdown = true
-  [timeout_thread, kom_thread].each do |t|
+  [timeout_thread, kom_thread].compact.each do |t|
     t.raise(Interrupt.new)
     t.join
   end
