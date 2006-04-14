@@ -504,6 +504,7 @@ module TextInterface
                 ['resumé'] => :history,
                 ['resume'] => :history,
                 ['svordom'] => :unimplemented,
+                ['surfa'] => :svg_static,
 
                 ['elisphack'] => :elisphack,
                 ['status'] => :status,
@@ -1044,6 +1045,13 @@ module TextInterface
       result << "\n"
     end
     post result
+  end
+
+  def svg_static(words = nil)
+    hash = current_game!.map.countries.collect do |c|
+      '%d,%d' % [c.owner ? c.owner.number : 6, c.armies]
+    end.join(';')
+    post 'Surfa till: %sstatic.svg#s%s' % [ $WEB_SETTINGS[:base_url], hash ]
   end
 
   def elisphack(words = nil)
