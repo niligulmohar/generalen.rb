@@ -20,7 +20,7 @@ module Person
 
   class TextInterfacePerson < Person
     include TextInterface
-    attr_reader :games
+    attr_reader :games, :current_game
     def initialize
       @current_game = nil
       @games = OrderedHash.new

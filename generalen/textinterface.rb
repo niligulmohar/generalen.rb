@@ -255,9 +255,17 @@ module TextInterface
     def maybe_request_ready
       if not @ready and @game.players.length > 1
         if @has_been_ready
-          @person.post('Du måste skriva "börja" igen om du är redo.')
+          if @person.current_game != game
+            @person.post('Du måste gå till %s och skriva "börja" igen om du är redo.' % @game.name)
+          else
+            @person.post('Du måste skriva "börja" igen om du är redo.')
+          end
         else
-          @person.post('Skriv "börja" om du är redo att börja partiet.')
+          if @person.current_game != game
+            @person.post('Gå till %s och skriv "börja" om du är redo att börja partiet.' % @game.name)
+          else
+            @person.post('Skriv "börja" om du är redo att börja partiet.')
+          end
         end
       end
     end
