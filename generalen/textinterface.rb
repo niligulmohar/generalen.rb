@@ -425,17 +425,18 @@ module TextInterface
                                                                                           params[:from].owner.person.name,
                                                                                           params[:target].name,
                                                                                           params[:target].owner ? params[:target].owner.person.name : 'Neutral' ])
-        message << "   Anfall: %s\n  Försvar: %s\n\n" % ([ dice_text(params[:attack]),
-                                                           dice_text(params[:defence]) ])
-        message << "%23s: %2d - %2d = %2d\n%23s: %2d - %2d = %2d" % ([ params[:from].name,
-                                                                       params[:from].armies + params[:attacker_losses],
-                                                                       params[:attacker_losses],
-                                                                       params[:from].armies,
-                                                                       params[:target].name,
-                                                                       params[:target].armies + params[:defender_losses],
-                                                                       params[:defender_losses],
-                                                                       params[:target].armies ])
-        @person.post_maybe_delayed(@game, message, params[:player] != player)
+        message << "   Anfall: %-11s   %23s: %2d - %2d = %2d\n  Försvar: %-11s   %23s: %2d - %2d = %2d\n\n" %
+            ([ dice_text(params[:attack]),
+               params[:from].name,
+               params[:from].armies + params[:attacker_losses],
+               params[:attacker_losses],
+               params[:from].armies,
+               dice_text(params[:defence]),
+               params[:target].name,
+               params[:target].armies + params[:defender_losses],
+               params[:defender_losses],
+               params[:target].armies ])
+            @person.post_maybe_delayed(@game, message, params[:player] != player)
       when :conquer
         @person.post_map(@game) if params[:player] == player
         message = "%s erövrar %s!\n\n" % [ params[:target].owner.person.name, params[:target].name ]
