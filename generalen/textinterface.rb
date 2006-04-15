@@ -290,11 +290,6 @@ module TextInterface
     end
     def may_auto_change_game?
       if @person.current_game
-        #puts @person.name
-        #puts @person.current_game != @game
-        #puts @person.current_game.ongoing
-        #puts !@person.current_game.in_turn(@person)
-        # @person.current_game != @game and @person.current_game.ongoing and not @person.current_game.in_turn(@person)
         @person.current_game != @game and not @person.current_game.in_turn(@person)
       else
         true
@@ -425,7 +420,7 @@ module TextInterface
                                                                                           params[:from].owner.person.name,
                                                                                           params[:target].name,
                                                                                           params[:target].owner ? params[:target].owner.person.name : 'Neutral' ])
-        message << "   Anfall: %-11s   %23s: %2d - %2d = %2d\n  Försvar: %-11s   %23s: %2d - %2d = %2d\n\n" %
+        message << "   Anfall: %-11s   %23s: %2d - %2d = %2d\n  Försvar: %-11s   %23s: %2d - %2d = %2d" %
             ([ dice_text(params[:attack]),
                params[:from].name,
                params[:from].armies + params[:attacker_losses],
