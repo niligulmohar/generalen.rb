@@ -33,10 +33,12 @@ class State
     end
   end
 
-  def transaction(&block)
-    @store.transaction do
-      @store[:mtime] = Time.now
-      block.call()
+  def transaction()
+    @mutex.synchronize do
+      @store.transaction do
+        @store[:mtime] = Time.now
+        yield
+      end
     end
   end
 
@@ -52,10 +54,8 @@ class State
   end
 
   def with_person(key)
-    @mutex.synchronize do
-      transaction do
-        yield @store[:people][key]
-      end
+    transaction do
+      yield @store[:people][key]
     end
   end
 
