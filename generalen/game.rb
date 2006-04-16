@@ -64,6 +64,7 @@ module Game
       @name = name
       @random = random_source
       @settings = OrderedHash.new([ [ :gametype, Setting::GameType.new ],
+                                    [ :cards, Setting::CardType.new ],
                                     [ :timeout, Setting::Timeout.new ] ])
       @map = Map.new(self)
       @people_players = OrderedHash.new
@@ -74,6 +75,7 @@ module Game
       @started = false
       @ended = false
       @round = 0
+      @n_card_combos = 0
     end
 
     def people
@@ -148,6 +150,24 @@ module Game
     def all_missions
       p = players
       (0...@map.n_missions(p.length)).collect{ |n| @map.mission(players.first, n, p) }
+    end
+
+    def progressive_card_value(order = nil)
+      order = @n_card_combos + 1 unless order
+      case order
+      when 1..4
+        order * 2 + 2
+      else
+        order * 5 - 10
+      end
+    end
+
+    def progressive_cards?
+      @settings[:cards] && @settings[:cards].value == :progressive
+    end
+
+    def combination_cards?
+      @settings[:cards].nil? || @settings[:cards].value == :combination
     end
 
     private
@@ -432,7 +452,15 @@ module Game
         elsif params[:cards].sort.zip(@turn_queue.first.cards.sort).any?{ |c, p| c.last > p.last }
           raise InsuficcentCardsException.new
         else
-          bonus_armies = CARD_COMBOS.assoc(params[:cards]).last
+          @n_card_combos ||= 0
+          @n_card_combos += 1
+          if combination_cards?
+            bonus_armies = CARD_COMBOS.assoc(params[:cards]).last
+          elsif progressive_cards?
+            bonus_armies = progressive_card_value(@n_card_combos)
+          else
+            raise RuntimeError.new
+          end
           params[:cards].each do |card, n|
             params[:player].cards[card] -= n
           end

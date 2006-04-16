@@ -110,7 +110,7 @@ module TextInterface
                                        end
                                    end
                                  end)
-        result << "  %s%s%s\n" % [ map.game.name, (map.game.round > 0 ? ', omgång %d' % map.game.round : ''), deadline_str(map.game) ]
+        result << "  %s%s%s%s\n" % [ map.game.name, (map.game.round > 0 ? ', omgång %d' % map.game.round : ''), deadline_str(map.game), progressive_cards_str(map.game) ]
         map.game.initial_turn_order.each do |player|
           result << "  (%s) %s%s\n" % ([ INITIALS[player.number],
                                          player.name,
@@ -201,6 +201,14 @@ module TextInterface
       n_cards.swedish_quantity('kort', 'kort', :neutrum => true).capitalize
     else
       cards.collect.sort.collect{ |c, n| (['[%s]' % c.to_s.upcase] * n).join(' ') }.reject{ |s| s.empty? }.join(' ')
+    end
+  end
+
+  def progressive_cards_str(game)
+    if game.progressive_cards? && game.started
+      ' [Kort ger %s]' % game.progressive_card_value.swedish_quantity('armé', 'arméer')
+    else
+      ''
     end
   end
 
@@ -489,6 +497,7 @@ module TextInterface
                 ['anfall'] => :attack,
                 ['flytta'] => :move,
                 ['kort'] => :cards,
+                ['byt', 'in'] => :use_cards,
                 ['karta'] => :map,
                 ['administrera', 'starta'] => :start,
                 ['administrera', 'stoppa'] => :stop,
@@ -555,7 +564,8 @@ module TextInterface
                  "nytt parti [SPEL]",
                  "deltag i [SPEL]",
                  "börja",
-                 "kort ...",
+                 "kort",
+                 "byt in",
                  "placera ...",
                  "anfall ...",
                  "flytta ...",
@@ -936,12 +946,34 @@ module TextInterface
     post("Ditt uppdrag är: %s\n\nDu vinner om villkoren är eller blir uppfyllda under din tur." % mission.swedish)
   end
 
+  def post_card_combos
+    post '3xA ger fyra arméer, 3xB ger sex, 3xC ger åtta. Ett av varje ger tio. * fungerar som joker.'
+  end
+
+  def post_card_progression
+    post "Giltiga kortkombinationer är tre lika kort eller tre olika kort. * fungerar som joker.\n\nVarje gång en kortkombination byts in så ändras antalet arméer man får i utbyte enligt serien %s, ..." % (1..10).collect{ |n| @current_game.progressive_card_value(n) }.join(', ')
+  end
+
+  def use_cards(words = [])
+    if words.empty?
+      post "Användningsexempel:\n    byt in a a a\n    byt in a b c\n    byt in c c *"
+    end
+    cards(words)
+  end
+
   def cards(words = [])
     if words.empty?
-      post "Användningsexempel:\n    kort a a a\n    kort a b c\n    kort c c *\n\n3xA ger fyra arméer, 3xB ger sex, 3xC ger åtta. En av varje ger tio. * fungerar som joker."
+      post 'Kortkombinationer kan bytas in mot extra arméer under placeringsfasen.'
       if @current_game
+        if @current_game.combination_cards?
+          post_card_combos
+        elsif @current_game.progressive_cards?
+          post_card_progression
+        else
+          raise RuntimeError.new
+        end
         cards = @current_game.people_players[self].cards
-        if cards.empty?
+        unless cards.values.detect{ |n| n != 0}
           post 'Du har inga kort i %s.' % @current_game.name
         else
           post 'Du har följande kort i %s: %s' % [ @current_game.name, cards_str(cards) ]

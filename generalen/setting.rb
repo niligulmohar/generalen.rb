@@ -81,6 +81,19 @@ module Game
       end
     end
 
+    class CardType < ChoiceSetting
+      def gen_choices
+        [ Choice.new('Enligt kombination', :combination),
+          Choice.new('Progressivt', :progressive) ]
+      end
+      def name
+        'Inbytesvärde för kort'
+      end
+      def description
+        'Anger reglerna för hur många arméer kortkombinationer är värda.'
+      end
+    end
+
     class Timeout < Setting
       def default
         1500
