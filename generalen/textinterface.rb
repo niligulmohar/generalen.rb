@@ -501,6 +501,7 @@ module TextInterface
                 ['resume'] => :history,
                 ['svordom'] => :unimplemented,
                 ['surfa'] => :svg_static,
+                ['uppdrag'] => :mission,
 
                 ['elisphack'] => :elisphack,
                 ['status'] => :status,
@@ -570,7 +571,8 @@ module TextInterface
                  "sätt NAMN [= VÄRDE]",
                  "var smygig",
                  "var pratig",
-                 "resumé [i brev]" ]).sort
+                 "resumé [i brev]",
+                 "uppdrag" ]).sort
     text << phrases.column_list_view
     text << "\nNamn och fraser går att kom-förkorta varhelst man vill."
     text << "\n\nFramför klagomål till <person 9023: Nicklas Lindgren (Äter mopeder, öppnar kasino)>\n\nGurk. Ost."
@@ -944,9 +946,6 @@ module TextInterface
         else
           post 'Du har följande kort i %s: %s' % [ @current_game.name, cards_str(cards) ]
         end
-        if @current_game.settings[:gametype].value == :mission
-          post_mission(@current_game.people_players[self].mission)
-        end
       end
     else
       cards = { :a => 0, :b => 0, :c => 0, :* => 0 }
@@ -965,6 +964,20 @@ module TextInterface
     post 'Det är inte en giltig kortkombination!'
   rescue Game::InsuficcentCardsException
     post 'Du har inte alla dom korten!'
+  end
+
+  def mission(words = nil)
+    if current_game!.settings[:gametype].value != :mission
+      post 'Hemliga uppdrag används inte i det här partiet!'
+      return
+    end
+    if @current_game.people_players[self].mission.nil?
+      post 'Du har inte tilldelats något uppdrag än!'
+    else
+      post_mission(@current_game.people_players[self].mission.swedish)
+    end
+    missions = "De möjliga uppdragen är:\n\n" + @current_game.all_missions.collect{ |m| '  ' + m.swedish }.join("\n\n")
+    post missions
   end
 
   def map(words = [])

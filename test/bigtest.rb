@@ -396,7 +396,6 @@ class BigTestCase < Test::Unit::TestCase
       p.command('ko')
       assert_match( /Användn/, p.get )
       assert_match( /Du har följande kort.*C/, p.get )
-      assert_match( /Ditt uppdrag.*Utplåna Pelle/, p.get )
       p.command('ko a a b')
       assert_match( /Det är inte en giltig kortkombination/, p.get )
       p.command('ko a b c')
@@ -449,13 +448,11 @@ class BigTestCase < Test::Unit::TestCase
       p.command('ko')
       assert_match( /exempel/, p.get )
       assert_match( /.A. .B. .C./, p.get )
-      assert_match( /uppdrag/, p.get )
       p.command('ko a b c')
       assert_match( /Stina får tio extra arméer för följande kort/, p.get )
       p.command('ko')
       assert_match( /exempel/, p.get )
       assert_match( /Inga kort/, p.get )
-      assert_match( /uppdrag/, p.get )
     end
   end
 
@@ -960,7 +957,6 @@ class BigTestCase < Test::Unit::TestCase
       p.command('kort')
       assert_match( /exempel/, p.get )
       assert_match( /.A. .A./, p.get )
-      assert_match( /uppdrag/, p.get )
       p.command('klar')
       assert_match( /Du får ett kort.*A/, p.get )
       assert_match( /Turen övergår till Kalle/, p.get )

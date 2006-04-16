@@ -145,6 +145,10 @@ module Game
     def active_players
       @turn_queue.reject{ |p| p == :new_round }
     end
+    def all_missions
+      p = players
+      (0...@map.n_missions(p.length)).collect{ |n| @map.mission(players.first, n, p) }
+    end
 
     private
     def timeout_poll(params = {})
