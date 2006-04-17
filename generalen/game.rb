@@ -817,7 +817,9 @@ module Game
     def completed?(params = nil)
       params ||= @params
       if params[:kill_player]
-        if not @player.game.active_players.include?(params[:kill_player])
+        if @player == params[:kill_player]
+          return completed?(@fallback_params)
+        elsif not @player.game.active_players.include?(params[:kill_player])
           if not @player.has_defeated.include?(params[:kill_player])
             return completed?(@fallback_params)
           end
