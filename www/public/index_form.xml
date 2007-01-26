@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="sv" lang="sv">
+  <head>
+    <title>Generalen</title>
+    <link href="/style.css" media="screen" rel="Stylesheet" type="text/css" />
+    <script src="/MochiKit.js" type="text/javascript" />
+    <script src="/generalen.js" type="text/javascript" />
+  </head>
+  <body onload='G.start()'>
+    <svg height='537' xmlns='http://www.w3.org/2000/svg' width='800' style='display:none'>
+      <g>
+	<rect x='0' y='0' id='o' fill='#8686ff' height='537' width='800'/>
+	<g font-weight='bold' font-size='24px' text-anchor='middle' id='w' font-family='Verdana, Helvetica, sans-serif' text-align='center'>
+	  <path d='M 105,7 L 135,7 L 145,29 L 135,45 L 105,45 L 95,29 L 105,7 z M 165,7 L 295,7 L 305,29 L 295,45 L 275,45 L 245,96 L 225,62 L 195,62 L 185,45 L 165,45 L 155,29 L 165,7 z ' id='c0' stroke-width='2' stroke='#686f00' fill='#ffffff' onclick='G.c(0)'/>
+	  <path d='M 465,7 L 495,7 L 475,45 L 505,96 L 495,112 L 485,112 L 475,96 L 465,96 L 455,112 L 465,129 L 455,146 L 445,146 L 435,162 L 425,162 L 395,112 L 425,62 L 435,62 L 465,7 z ' id='c6' stroke-width='2' stroke='#08005a' fill='#ffffff' onclick='G.c(6)'/>
+	  <path d='M 495,7 L 515,7 L 525,29 L 515,45 L 495,45 L 525,96 L 515,112 L 555,179 L 565,179 L 545,213 L 525,213 L 515,229 L 545,280 L 505,280 L 515,263 L 505,246 L 495,246 L 475,213 L 465,213 L 445,179 L 455,179 L 505,96 L 475,45 L 495,7 z ' id='c13' stroke-width='2' stroke='#08005a' fill='#ffffff' onclick='G.c(13)'/>
+	  <path d='M 505,62 L 545,62 L 635,213 L 605,213 L 585,179 L 555,179 L 515,112 L 525,96 L 505,62 z ' id='c9' stroke-width='2' stroke='#005a08' fill='#ffffff' onclick='G.c(9)'/>
+	  <path d='M 545,62 L 565,29 L 585,29 L 595,45 L 585,62 L 635,146 L 655,146 L 665,162 L 675,162 L 655,196 L 665,213 L 635,213 L 545,62 z ' id='c14' stroke-width='2' stroke='#005a08' fill='#ffffff' onclick='G.c(14)'/>
+	  <path d='M 595,45 L 675,45 L 655,79 L 665,96 L 605,96 L 585,62 L 595,45 z ' id='c2' stroke-width='2' stroke='#005a08' fill='#ffffff' onclick='G.c(2)'/>
+	  <path d='M 685,29 L 765,29 L 745,62 L 715,62 L 735,96 L 725,112 L 705,79 L 695,96 L 735,162 L 725,179 L 715,162 L 705,162 L 655,79 L 685,29 z ' id='c3' stroke-width='2' stroke='#005a08' fill='#ffffff' onclick='G.c(3)'/>
+	  <path d='M 5,79 L 25,45 L 65,45 L 75,62 L 55,96 L 65,112 L 55,129 L 35,96 L 15,96 L 5,79 z ' id='c1' stroke-width='2' stroke='#686f00' fill='#ffffff' onclick='G.c(1)'/>
+	  <path d='M 75,62 L 135,62 L 105,112 L 65,112 L 55,96 L 75,62 z ' id='c4' stroke-width='2' stroke='#686f00' fill='#ffffff' onclick='G.c(4)'/>
+	  <path d='M 135,62 L 175,62 L 155,96 L 185,146 L 175,162 L 135,162 L 105,112 L 135,62 z ' id='c7' stroke-width='2' stroke='#686f00' fill='#ffffff' onclick='G.c(7)'/>
+	  <path d='M 195,96 L 225,96 L 245,129 L 225,162 L 175,162 L 185,146 L 175,129 L 195,96 z ' id='c8' stroke-width='2' stroke='#686f00' fill='#ffffff' onclick='G.c(8)'/>
+	  <path d='M 285,62 L 325,62 L 335,79 L 315,112 L 275,112 L 265,96 L 285,62 z ' id='c5' stroke-width='2' stroke='#08005a' fill='#ffffff' onclick='G.c(5)'/>
+	  <path d='M 345,96 L 385,96 L 355,146 L 365,162 L 375,162 L 385,179 L 375,196 L 325,196 L 315,179 L 345,129 L 335,112 L 345,96 z M 305,129 L 335,129 L 315,162 L 305,162 L 295,146 L 305,129 z ' id='c12' stroke-width='2' stroke='#08005a' fill='#ffffff' onclick='G.c(12)'/>
+	  <path d='M 605,96 L 665,96 L 705,162 L 665,162 L 655,146 L 635,146 L 605,96 z ' id='c10' stroke-width='2' stroke='#005a08' fill='#ffffff' onclick='G.c(10)'/>
+	  <path d='M 675,162 L 715,162 L 725,179 L 705,213 L 725,246 L 705,246 L 695,229 L 675,229 L 655,196 L 675,162 z ' id='c16' stroke-width='2' stroke='#005a08' fill='#ffffff' onclick='G.c(16)'/>
+	  <path d='M 745,112 L 775,112 L 795,146 L 765,146 L 795,196 L 775,229 L 765,229 L 755,246 L 745,246 L 725,213 L 755,162 L 735,129 L 745,112 z ' id='c19' stroke-width='2' stroke='#005a08' fill='#ffffff' onclick='G.c(19)'/>
+	  <path d='M 65,112 L 105,112 L 135,162 L 55,162 L 65,146 L 55,129 L 65,112 z ' id='c11' stroke-width='2' stroke='#686f00' fill='#ffffff' onclick='G.c(11)'/>
+	  <path d='M 55,162 L 155,162 L 175,196 L 145,246 L 85,246 L 45,179 L 55,162 z ' id='c17' stroke-width='2' stroke='#686f00' fill='#ffffff' onclick='G.c(17)'/>
+	  <path d='M 155,162 L 225,162 L 235,146 L 265,146 L 235,196 L 255,229 L 225,229 L 215,213 L 195,213 L 175,246 L 145,246 L 175,196 L 155,162 z ' id='c15' stroke-width='2' stroke='#686f00' fill='#ffffff' onclick='G.c(15)'/>
+	  <path d='M 415,179 L 445,179 L 465,213 L 455,229 L 405,229 L 395,213 L 415,179 z ' id='c18' stroke-width='2' stroke='#08005a' fill='#ffffff' onclick='G.c(18)'/>
+	  <path d='M 565,179 L 585,179 L 615,229 L 595,263 L 615,296 L 555,296 L 545,280 L 555,263 L 545,246 L 555,229 L 545,213 L 565,179 z ' id='c21' stroke-width='2' stroke='#005a08' fill='#ffffff' onclick='G.c(21)'/>
+	  <path d='M 605,213 L 665,213 L 675,229 L 695,229 L 705,246 L 725,246 L 685,313 L 655,313 L 645,296 L 615,296 L 595,263 L 615,229 L 605,213 z ' id='c23' stroke-width='2' stroke='#005a08' fill='#ffffff' onclick='G.c(23)'/>
+	  <path d='M 85,246 L 175,246 L 165,263 L 175,280 L 185,263 L 205,263 L 185,296 L 205,330 L 175,330 L 165,313 L 135,313 L 105,263 L 95,263 L 85,246 z ' id='c24' stroke-width='2' stroke='#686f00' fill='#ffffff' onclick='G.c(24)'/>
+	  <path d='M 335,213 L 395,213 L 405,229 L 385,263 L 365,263 L 355,280 L 315,280 L 305,263 L 315,246 L 335,246 L 345,229 L 335,213 z ' id='c20' stroke-width='2' stroke='#08005a' fill='#ffffff' onclick='G.c(20)'/>
+	  <path d='M 405,229 L 455,229 L 465,213 L 475,213 L 495,246 L 485,263 L 465,263 L 455,280 L 405,280 L 415,263 L 385,263 L 405,229 z ' id='c22' stroke-width='2' stroke='#08005a' fill='#ffffff' onclick='G.c(22)'/>
+	  <path d='M 485,280 L 545,280 L 555,296 L 575,296 L 555,330 L 515,330 L 525,346 L 545,346 L 525,380 L 495,380 L 475,346 L 485,330 L 495,330 L 505,313 L 485,313 L 475,296 L 485,280 z ' id='c25' stroke-width='2' stroke='#005a08' fill='#ffffff' onclick='G.c(25)'/>
+	  <path d='M 575,296 L 645,296 L 655,313 L 605,397 L 595,397 L 555,330 L 575,296 z ' id='c28' stroke-width='2' stroke='#005a08' fill='#ffffff' onclick='G.c(28)'/>
+	  <path d='M 655,313 L 705,313 L 715,330 L 685,380 L 675,380 L 645,330 L 655,313 z ' id='c29' stroke-width='2' stroke='#005a08' fill='#ffffff' onclick='G.c(29)'/>
+	  <path d='M 325,296 L 355,296 L 365,313 L 415,313 L 405,330 L 425,363 L 415,380 L 345,380 L 335,397 L 305,397 L 285,363 L 325,296 z ' id='c26' stroke-width='2' stroke='#5a3500' fill='#ffffff' onclick='G.c(26)'/>
+	  <path d='M 415,313 L 455,313 L 485,363 L 475,380 L 415,380 L 425,363 L 405,330 L 415,313 z ' id='c27' stroke-width='2' stroke='#5a3500' fill='#ffffff' onclick='G.c(27)'/>
+	  <path d='M 175,330 L 205,330 L 215,346 L 245,346 L 255,363 L 235,363 L 225,380 L 115,380 L 135,346 L 165,346 L 175,330 z ' id='c30' stroke-width='2' stroke='#5a0000' fill='#ffffff' onclick='G.c(30)'/>
+	  <path d='M 235,363 L 255,363 L 275,397 L 245,447 L 235,447 L 225,463 L 215,463 L 205,447 L 215,430 L 205,413 L 195,413 L 175,380 L 225,380 L 235,363 z ' id='c32' stroke-width='2' stroke='#5a0000' fill='#ffffff' onclick='G.c(32)'/>
+	  <path d='M 115,380 L 175,380 L 195,413 L 205,413 L 215,430 L 145,430 L 115,380 z ' id='c31' stroke-width='2' stroke='#5a0000' fill='#ffffff' onclick='G.c(31)'/>
+	  <path d='M 145,430 L 215,430 L 205,447 L 215,463 L 175,530 L 145,530 L 125,497 L 155,447 L 145,430 z ' id='c38' stroke-width='2' stroke='#5a0000' fill='#ffffff' onclick='G.c(38)'/>
+	  <path d='M 345,380 L 395,380 L 435,447 L 425,463 L 375,463 L 355,430 L 365,413 L 355,397 L 335,397 L 345,380 z ' id='c34' stroke-width='2' stroke='#5a3500' fill='#ffffff' onclick='G.c(34)'/>
+	  <path d='M 395,380 L 465,380 L 475,397 L 505,397 L 475,447 L 435,447 L 395,380 z ' id='c33' stroke-width='2' stroke='#5a3500' fill='#ffffff' onclick='G.c(33)'/>
+	  <path d='M 435,447 L 475,447 L 455,480 L 465,497 L 445,530 L 425,530 L 385,463 L 425,463 L 435,447 z ' id='c39' stroke-width='2' stroke='#5a3500' fill='#ffffff' onclick='G.c(39)'/>
+	  <path d='M 505,430 L 545,430 L 555,447 L 545,463 L 535,463 L 515,497 L 485,497 L 475,480 L 505,430 z ' id='c37' stroke-width='2' stroke='#5a3500' fill='#ffffff' onclick='G.c(37)'/>
+	  <path d='M 675,397 L 695,397 L 715,430 L 705,447 L 655,447 L 645,430 L 655,413 L 665,413 L 675,397 z ' id='c35' stroke-width='2' stroke='#5a0048' fill='#ffffff' onclick='G.c(35)'/>
+	  <path d='M 735,397 L 765,397 L 775,413 L 785,413 L 795,430 L 785,447 L 745,447 L 725,413 L 735,397 z ' id='c36' stroke-width='2' stroke='#5a0048' fill='#ffffff' onclick='G.c(36)'/>
+	  <path d='M 665,463 L 745,463 L 735,480 L 715,480 L 685,530 L 625,530 L 635,514 L 625,497 L 635,480 L 655,480 L 665,463 z ' id='c40' stroke-width='2' stroke='#5a0048' fill='#ffffff' onclick='G.c(40)'/>
+	  <path d='M 745,463 L 765,463 L 785,497 L 765,530 L 685,530 L 715,480 L 735,480 L 745,463 z ' id='c41' stroke-width='2' stroke='#5a0048' fill='#ffffff' onclick='G.c(41)'/>
+	  <path stroke-linecap='round' d='M 105,7 L 95,29 L 105,45 L 135,45 L 145,29 L 135,7 L 105,7 z M 165,7 L 155,29 L 165,45 L 185,45 L 195,62 L 225,62 L 245,96 L 275,45 L 295,45 L 305,29 L 295,7 L 165,7 z M 25,45 L 5,79 L 15,96 L 35,96 L 55,129 L 65,146 L 55,162 L 45,179 L 85,246 L 95,263 L 105,263 L 135,313 L 165,313 L 175,330 L 205,330 L 185,296 L 205,263 L 185,263 L 175,280 L 165,263 L 175,246 L 195,213 L 215,213 L 225,229 L 255,229 L 235,196 L 265,146 L 235,146 L 245,129 L 225,96 L 195,96 L 175,129 L 155,96 L 175,62 L 135,62 L 75,62 L 65,45 L 25,45 z ' id='cn0' stroke-width='5' stroke='#686f00' fill='none' stroke-linejoin='round'/>
+	  <path stroke-linecap='round' d='M 465,7 L 435,62 L 425,62 L 395,112 L 425,162 L 435,162 L 445,146 L 455,146 L 465,129 L 455,112 L 465,96 L 475,96 L 485,112 L 495,112 L 455,179 L 445,179 L 415,179 L 395,213 L 335,213 L 345,229 L 335,246 L 315,246 L 305,263 L 315,280 L 355,280 L 365,263 L 385,263 L 415,263 L 405,280 L 455,280 L 465,263 L 485,263 L 495,246 L 505,246 L 515,263 L 505,280 L 545,280 L 515,229 L 525,213 L 545,213 L 565,179 L 555,179 L 515,112 L 525,96 L 495,45 L 515,45 L 525,29 L 515,7 L 495,7 L 465,7 z M 285,62 L 265,96 L 275,112 L 315,112 L 335,79 L 325,62 L 285,62 z M 345,96 L 335,112 L 345,129 L 315,179 L 325,196 L 375,196 L 385,179 L 375,162 L 365,162 L 355,146 L 385,96 L 345,96 z M 305,129 L 295,146 L 305,162 L 315,162 L 335,129 L 305,129 z ' id='cn1' stroke-width='5' stroke='#08005a' fill='none' stroke-linejoin='round'/>
+	  <path stroke-linecap='round' d='M 675,397 L 665,413 L 655,413 L 645,430 L 655,447 L 705,447 L 715,430 L 695,397 L 675,397 z M 735,397 L 725,413 L 745,447 L 785,447 L 795,430 L 785,413 L 775,413 L 765,397 L 735,397 z M 665,463 L 655,480 L 635,480 L 625,497 L 635,514 L 625,530 L 685,530 L 765,530 L 785,497 L 765,463 L 745,463 L 665,463 z ' id='cn5' stroke-width='5' stroke='#5a0048' fill='none' stroke-linejoin='round'/>
+	  <g>
+	    <path stroke-linecap='round' d='M 175,330 L 165,346 L 135,346 L 115,380 L 145,430 L 155,447 L 125,497 L 145,530 L 175,530 L 215,463 L 225,463 L 235,447 L 245,447 L 275,397 L 255,363 L 245,346 L 215,346 L 205,330' stroke-width='5' stroke='#5a0000' fill='none' stroke-linejoin='round'/>
+	    <path stroke-linecap='round' stroke-dashoffset='2' d='M 175,330 L 205,330' stroke-width='5' stroke='#5a0000' stroke-dasharray='5, 10' fill='none'/>
+	  </g>
+	  <g>
+	    <path stroke-linecap='round' d='M 745,112 L 735,129 L 755,162 L 725,213 L 745,246 L 755,246 L 765,229 L 775,229 L 795,196 L 765,146 L 795,146 L 775,112 L 745,112 z M 505,280 L 485,280 L 475,296 L 485,313 L 505,313 L 495,330 L 485,330 L 475,346 L 495,380 L 525,380 L 545,346 L 525,346 L 515,330 L 555,330 L 595,397 L 605,397 L 645,330 L 675,380 L 685,380 L 715,330 L 705,313 L 685,313 L 725,246 L 705,213 L 725,179 L 735,162 L 695,96 L 705,79 L 725,112 L 735,96 L 715,62 L 745,62 L 765,29 L 685,29 L 675,45 L 595,45 L 585,29 L 565,29 L 545,62 L 505,62 M 545,213 L 555,229 L 545,246 L 555,263 L 545,280' stroke-width='5' stroke='#005a08' fill='none' stroke-linejoin='round'/>
+	    <path stroke-linecap='round' stroke-dashoffset='4' d='M 505,280 L 545,280' stroke-width='5' stroke='#005a08' stroke-dasharray='5, 10' fill='none' stroke-linejoin='round'/>
+	    <path stroke-linecap='round' stroke-dashoffset='0' d='M 505,62 L 525,96 L 515,112 L 555,179 L 565,179 L 545,213' stroke-width='5' stroke='#005a08' stroke-dasharray='5, 10' fill='none' stroke-linejoin='round'/>
+	  </g>
+	  <g>
+	    <path stroke-linecap='round' d='M 505,430 L 475,480 L 485,497 L 515,497 L 535,463 L 545,463 L 555,447 L 545,430 L 505,430 z M 475,346 L 455,313 L 415,313 L 365,313 L 355,296 L 325,296 L 285,363 L 305,397 L 335,397 L 355,397 L 365,413 L 355,430 L 375,463 L 385,463 L 425,530 L 445,530 L 465,497 L 455,480 L 475,447 L 505,397 L 475,397 L 465,380 L 475,380 L 485,363' stroke-width='5' stroke='#5a3500' fill='none' stroke-linejoin='round'/>
+	    <path stroke-linecap='round' stroke-dashoffset='2' d='M 475,346 L 485,363' stroke-width='5' stroke='#5a3500' stroke-dasharray='5, 10' fill='none'/>
+	  </g>
+	  <text x='237' y='47' id='t0' onclick='G.c(0)'>?</text>
+	  <text x='42' y='77' id='t1' onclick='G.c(1)'>?</text>
+	  <text x='627' y='77' id='t2' onclick='G.c(2)'>?</text>
+	  <text x='692' y='72' id='t3' onclick='G.c(3)'>?</text>
+	  <text x='92' y='92' id='t4' onclick='G.c(4)'>?</text>
+	  <text x='302' y='92' id='t5' onclick='G.c(5)'>?</text>
+	  <text x='442' y='102' id='t6' onclick='G.c(6)'>?</text>
+	  <text x='142' y='127' id='t7' onclick='G.c(7)'>?</text>
+	  <text x='212' y='132' id='t8' onclick='G.c(8)'>?</text>
+	  <text x='557' y='137' id='t9' onclick='G.c(9)'>?</text>
+	  <text x='647' y='127' id='t10' onclick='G.c(10)'>?</text>
+	  <text x='92' y='147' id='t11' onclick='G.c(11)'>?</text>
+	  <text x='347' y='182' id='t12' onclick='G.c(12)'>?</text>
+	  <text x='507' y='177' id='t13' onclick='G.c(13)'>?</text>
+	  <text x='637' y='177' id='t14' onclick='G.c(14)'>?</text>
+	  <text x='207' y='192' id='t15' onclick='G.c(15)'>?</text>
+	  <text x='692' y='197' id='t16' onclick='G.c(16)'>?</text>
+	  <text x='112' y='207' id='t17' onclick='G.c(17)'>?</text>
+	  <text x='432' y='212' id='t18' onclick='G.c(18)'>?</text>
+	  <text x='762' y='207' id='t19' onclick='G.c(19)'>?</text>
+	  <text x='367' y='242' id='t20' onclick='G.c(20)'>?</text>
+	  <text x='577' y='242' id='t21' onclick='G.c(21)'>?</text>
+	  <text x='442' y='257' id='t22' onclick='G.c(22)'>?</text>
+	  <text x='657' y='267' id='t23' onclick='G.c(23)'>?</text>
+	  <text x='147' y='287' id='t24' onclick='G.c(24)'>?</text>
+	  <text x='532' y='312' id='t25' onclick='G.c(25)'>?</text>
+	  <text x='357' y='347' id='t26' onclick='G.c(26)'>?</text>
+	  <text x='442' y='352' id='t27' onclick='G.c(27)'>?</text>
+	  <text x='602' y='342' id='t28' onclick='G.c(28)'>?</text>
+	  <text x='682' y='347' id='t29' onclick='G.c(29)'>?</text>
+	  <text x='187' y='367' id='t30' onclick='G.c(30)'>?</text>
+	  <text x='162' y='412' id='t31' onclick='G.c(31)'>?</text>
+	  <text x='232' y='412' id='t32' onclick='G.c(32)'>?</text>
+	  <text x='447' y='417' id='t33' onclick='G.c(33)'>?</text>
+	  <text x='392' y='427' id='t34' onclick='G.c(34)'>?</text>
+	  <text x='682' y='432' id='t35' onclick='G.c(35)'>?</text>
+	  <text x='757' y='432' id='t36' onclick='G.c(36)'>?</text>
+	  <text x='512' y='467' id='t37' onclick='G.c(37)'>?</text>
+	  <text x='172' y='482' id='t38' onclick='G.c(38)'>?</text>
+	  <text x='432' y='497' id='t39' onclick='G.c(39)'>?</text>
+	  <text x='672' y='502' id='t40' onclick='G.c(40)'>?</text>
+	  <text x='742' y='507' id='t41' onclick='G.c(41)'>?</text>
+	</g>
+      </g>
+    </svg>
+    <form id='login' action='' onsubmit='G.login_request()'>
+      <div>
+	<h1>Logga in</h1>
+	<p id='login_failure'>Inloggning misslyckades!</p>
+	<p>
+	  <label for='login_user'>Användarnamn</label>
+	  <input name='login_user' id='login_user' type='text'/>
+	  <label for='login_password'>Lösenord</label>
+	  <input name='login_password' id='login_password' type='password'/>
+	</p>
+      </div>
+    </form>
+  </body>
+</html>
