@@ -1,12 +1,13 @@
 #! /usr/bin/env ruby
 #--
-# Copyright (c) Nicklas Lindgren 2005-2006
+# Copyright (c) Nicklas Lindgren 2005-2007
 # Det här programmet distribueras under villkoren i GPL v2.
 #++
 
 require 'generalen/state'
 require 'generalen/game'
 require 'generalen/person'
+require 'www/servlet'
 require 'util/backup'
 require 'util/prefix_words_matches'
 require 'util/random'
@@ -21,7 +22,7 @@ require 'logger'
   def read(prompt)
     print(prompt)
     $stdout.flush
-    return gets
+    return $stdin.gets
   end
 # end
 
@@ -65,6 +66,7 @@ class Generalen < KomBot
   end
 
   def periodic
+    $logger.debug "periodic"
     send_message(@params[:person], 'ping!')
     $logger.debug('ping!')
 
@@ -77,6 +79,7 @@ class Generalen < KomBot
         end
       end
     end
+    $logger.debug "periodic done"
   end
 end
 
@@ -99,8 +102,18 @@ $state = State.new(STATE_FILE_NAME, Random::Source.new)
 
 # Thread.abort_on_exception = true
 
+
+def shutdown
+  $shutdown = true
+  [$kom_thread, $console_thread].compact.each do |t|
+    t.raise(Interrupt.new)
+    t.join
+  end
+  Servlet.stop
+end
+
 begin
-  console_thread = Thread.new do
+  $console_thread = Thread.new do
     loop do
       begin
         cmd = read((if $kombot && $kombot.running? then '-!-' else '---' end) + ' generalen> ')
@@ -126,6 +139,9 @@ begin
             end
           end
         end
+      rescue Interrupt
+        print "\n"
+        break
       rescue Exception => e
         puts e
         puts e.backtrace
@@ -134,7 +150,7 @@ begin
   end
 
   if ARGV.empty?
-    kom_thread = nil
+    $kom_thread = nil
     #kom_thread = Thread.new do
       begin
         $kombot = Generalen.new($KOM_SETTINGS)
@@ -147,13 +163,6 @@ begin
     #end
   end
 
-rescue Interrupt
-  puts
-ensure
-  $shutdown = true
-  [kom_thread, console_thread].compact.each do |t|
-    t.raise(Interrupt.new)
-    t.join
-  end
+  trap("INT") { shutdown }
+  Servlet.start
 end
-

@@ -565,7 +565,7 @@ module TextInterface
                  "deltag i [SPEL]",
                  "börja",
                  "kort",
-                 "byt in",
+                 "byt in ...",
                  "placera ...",
                  "anfall ...",
                  "flytta ...",
