@@ -35,34 +35,38 @@ class Generalen < KomBot
   end
 
   def async_send_message(msg, c)
-    if msg.recipient == @params[:person]
-      if msg.sender == @params[:person]
-        $logger.debug('pong!')
-        return
-      end
-      $logger.info 'send_message %s: %s' % [ c.conf_name(msg.sender), msg.message ]
-      $state.with_person(msg.sender) do |p|
-        if not p
-          p = $state.store[:people][msg.sender] = ::Person::KomPerson.new(msg.sender)
+    Thread.new do
+      if msg.recipient == @params[:person]
+        if msg.sender == @params[:person]
+          $logger.debug('pong!')
+          return
         end
-        begin
-          p.command(msg.message)
-        rescue Exception => e
-          puts e
-          puts e.backtrace
+        $logger.info 'send_message %s: %s' % [ c.conf_name(msg.sender), msg.message ]
+        $state.with_person(msg.sender) do |p|
+          if not p
+            p = $state.store[:people][msg.sender] = ::Person::KomPerson.new(msg.sender)
+          end
+          begin
+            p.command(msg.message)
+          rescue Exception => e
+            puts e
+            puts e.backtrace
+          end
+          p.flush
         end
-        p.flush
+        $logger.debug "send_message %s done" % [ c.conf_name(msg.sender), msg.message ]
       end
-      $logger.debug "send_message %s done" % [ c.conf_name(msg.sender), msg.message ]
     end
   end
 
   def async_login(msg, c)
-    $logger.info "login %s" % [c.conf_name(msg.person_no)]
-    $state.with_person(msg.person_no) do |p|
-      p.flush if p
+    Thread.new do
+      $logger.info "login %s" % [c.conf_name(msg.person_no)]
+      $state.with_person(msg.person_no) do |p|
+        p.flush if p
+      end
+      $logger.debug "login %s done" % [c.conf_name(msg.person_no)]
     end
-    $logger.debug "login %s done" % [c.conf_name(msg.person_no)]
   end
 
   def periodic
