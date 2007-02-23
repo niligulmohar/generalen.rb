@@ -156,8 +156,7 @@ begin
   end
 
   if ARGV.empty?
-    $kom_thread = nil
-    #kom_thread = Thread.new do
+    kom_thread = Thread.new do
       begin
         $kombot = Generalen.new($KOM_SETTINGS)
         $kombot.run
@@ -166,7 +165,7 @@ begin
         puts e
         puts e.backtrace
       end
-    #end
+    end
   end
 
   trap("INT") { shutdown }
