@@ -170,6 +170,10 @@ module Game
       @settings[:cards].nil? || @settings[:cards].value == :combination
     end
 
+    def push_deadline
+      maybe_set_deadline
+    end
+
     private
     def timeout_poll(params = {})
       if @turn_deadline and @turn_deadline < Time.now + 10

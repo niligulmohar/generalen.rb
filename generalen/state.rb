@@ -85,6 +85,23 @@ class State
     @store[:random]
   end
 
+  def startup
+    transaction do
+      if @store[:shutdown].nil?
+        push_deadlines
+      else
+        push_deadlines
+      end
+      @store[:shutdown] = nil
+    end
+  end
+
+  def shutdown
+    transaction do
+      @store[:shutdown] = Time.now
+    end
+  end
+
   def request(params = {})
     if not params.has_key?(:person)
       raise RuntimeError.new(':person-parameter missing in request')
@@ -115,9 +132,7 @@ class State
   def push_deadlines(params = {})
     $logger.info "Pushing deadlines"
     @store[:games].each do |g|
-      if g.turn_deadline
-        g.turn_deadline = Time.now + params[:time]
-      end
+      g.push_deadline
     end
   end
 

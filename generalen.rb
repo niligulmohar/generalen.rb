@@ -99,6 +99,7 @@ $logger.level = 1
 
 Backup::with_rotation(STATE_FILE_NAME)
 $state = State.new(STATE_FILE_NAME, Random::Source.new)
+$state.startup
 
 # Thread.abort_on_exception = true
 
@@ -110,6 +111,7 @@ def shutdown
     t.join
   end
   Servlet.stop
+  $state.shutdown
 end
 
 begin
