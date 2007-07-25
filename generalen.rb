@@ -168,6 +168,9 @@ begin
     end
   end
 
-  trap("INT") { shutdown }
-  Servlet.start
+  #trap("INT") { shutdown }
+  #Servlet.start
+  loop do
+    sleep(3600)
+  end
 end
