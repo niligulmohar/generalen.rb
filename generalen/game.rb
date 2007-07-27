@@ -554,7 +554,7 @@ module Game
     end
 
     def maybe_set_deadline
-      if settings[:timeout].value > 0
+      if settings[:timeout].value > 0 and @started
         @turn_deadline = Time.now + 60 * settings[:timeout].value
       end
     end
