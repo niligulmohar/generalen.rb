@@ -559,7 +559,7 @@ module TextInterface
   end
 
   def help(words = nil)
-    text = "Jag leder partier av ett spel inte helt olikt Risk.\n\nFraser jag potentiellt begriper:\n"
+    text = "(Sorry, i only speak swedish.)\n\nJag leder partier av ett spel inte helt olikt Risk.\n\nFraser jag potentiellt begriper:\n"
     phrases = ([ "partier",
                  "nytt parti [SPEL]",
                  "deltag i [SPEL]",
@@ -585,7 +585,7 @@ module TextInterface
                  "uppdrag" ]).sort
     text << phrases.column_list_view
     text << "\nNamn och fraser går att kom-förkorta varhelst man vill."
-    text << "\n\nFramför klagomål till <person 9023: Nicklas Lindgren (Äter mopeder, öppnar kasino)>\n\nGurk. Ost."
+    text << "\n\nFramför klagomål till #{$settings[:admin]}"
     post text
   end
 
