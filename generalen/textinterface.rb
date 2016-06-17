@@ -836,7 +836,9 @@ module TextInterface
 
   def done(words = [])
     current_game!
-    if not @hasty_done_warning and @current_game.first_placement_done and @current_game.in_turn(self) and
+    if not @current_game.started
+      post 'Spelet har inte startat ännu.'
+    elsif not @hasty_done_warning and @current_game.first_placement_done and @current_game.in_turn(self) and
         @current_game.turn_phase == 0 and @current_game.turn_queue.first.armies_for_placement == 0
       @hasty_done_warning = true
       post 'Varning: "klar" avslutar din tur. Är du säker på att du inte vill "anfalla" eller "flytta"? Den här varningen upprepas inte.'

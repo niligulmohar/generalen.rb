@@ -88,6 +88,17 @@ class BigTestCase < Minitest::Test
     end
   end
 
+  def test_create_done
+    $state.with_person(:Pelle) do |p|
+      p.command('ny')
+      assert_match( /Du har skapat Första partiet/, p.get )
+      assert_match( /Inställningar för/, p.get )
+      assert_match( /Du är nu aktiv i Första partiet/, p.get )
+      p.command('kl')
+      assert_match( /Spelet har inte startat/, p.get )
+    end
+  end
+
   def test_create_settings_start_twoplayer_surrender
     $state.with_person(:Pelle) do |p|
       p.command('ny')
