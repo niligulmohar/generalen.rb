@@ -1,8 +1,9 @@
+# coding: utf-8
 #--
 # Copyright (c) Nicklas Lindgren 2005-2006
 # Det här programmet distribueras under villkoren i GPL v2.
 #++
-require 'generalen/textinterface'
+require_relative '../generalen/textinterface'
 
 module Person
   class Person

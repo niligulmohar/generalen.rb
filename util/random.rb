@@ -1,3 +1,4 @@
+# coding: utf-8
 #--
 # Copyright (c) Nicklas Lindgren 2005-2006
 # Det här programmet distribueras under villkoren i GPL v2.
@@ -25,7 +26,7 @@ class Range
   end
 end
 
-module Random
+module Randomness
   class Source
     def initialize
     end
@@ -58,7 +59,8 @@ module Random
       end
       return result
     end
-    def choose_n_from(n, array)
+    def choose_n_from(n, sequence)
+      array = sequence.to_a
       raise TestSourceExhausted if @choose_results.empty?
       result = @choose_results.shift
       if not result.length == n

@@ -1,7 +1,7 @@
-require 'test/unit'
-require 'generalen/game'
+require 'minitest/autorun'
+require_relative '../generalen/game'
 
-class MapTestCase < Test::Unit::TestCase
+class MapTestCase < Minitest::Test
   def setup
     @map = Game::Map.new(nil)
   end

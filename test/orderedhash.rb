@@ -1,7 +1,7 @@
-require 'test/unit'
-require 'util/orderedhash'
+require 'minitest/autorun'
+require_relative '../util/orderedhash'
 
-class OrderedHashTestCase < Test::Unit::TestCase
+class OrderedHashTestCase < Minitest::Test
   def setup
     @keys = (1..500).collect { rand }
   end

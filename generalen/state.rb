@@ -1,3 +1,4 @@
+# coding: utf-8
 #--
 # Copyright (c) Nicklas Lindgren 2005-2006
 # Det här programmet distribueras under villkoren i GPL v2.
@@ -13,7 +14,7 @@ class RequestException < Exception
 end
 class TooManyGamesException < RequestException; end
 
-require 'generalen/game'
+require_relative '../generalen/game'
 
 class State
   attr_reader :store

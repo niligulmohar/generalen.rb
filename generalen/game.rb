@@ -1,16 +1,16 @@
-# -*- coding: iso-8859-1 -*-
+# coding: utf-8
 #--
 # Copyright (c) Nicklas Lindgren 2005-2006
-# Det här programmet distribueras under villkoren i GPL v2.
+# Det hÃ¤r programmet distribueras under villkoren i GPL v2.
 #++
 
 require 'forwardable'
 require 'observer'
 require 'set'
-require 'util/orderedhash'
-require 'util/swedish'
-require 'generalen/setting'
-require 'generalen/state'
+require_relative '../util/orderedhash'
+require_relative '../util/swedish'
+require_relative '../generalen/setting'
+require_relative '../generalen/state'
 
 class String
   def capitalize0
@@ -480,7 +480,7 @@ module Game
       @initial_turn_order = @turn_queue.clone
       @started = true
       if @settings[:gametype].value == :mission
-        missions = (0...@map.n_missions(@people_players.length)).collect
+        missions = (0...@map.n_missions(@people_players.length)).to_a
         players.each do |p|
           mission = @random.choose_n_from(1, missions).first
           missions.delete(mission)
@@ -575,10 +575,10 @@ module Game
         if @turn_queue.first.card_earned
           @turn_queue.first.card_earned = false
           @turn_queue.first.recieve_card(case @random.randrange(0...44)
-                                         when 0..13: :a
-                                         when 14..27: :b
-                                         when 28..41: :c
-                                         when 42..43: :*
+                                         when 0..13 then :a
+                                         when 14..27 then :b
+                                         when 28..41 then :c
+                                         when 42..43 then :*
                                          end)
           changed
           notify_observers(:card, :to_player => @turn_queue.first)
@@ -686,16 +686,16 @@ module Game
 
     NAME = :standard
 
-    COUNTRY_NAMES = ['Grönland', 'Alaska', 'Jakutsk', 'Kamchatka',
-      'Nordvästra territoriet', 'Island', 'Skandinavien', 'Ontario',
+    COUNTRY_NAMES = ['GrÃ¶nland', 'Alaska', 'Jakutsk', 'Kamchatka',
+      'NordvÃ¤stra territoriet', 'Island', 'Skandinavien', 'Ontario',
       'Quebec', 'Ural', 'Irkutsk', 'Alberta', 'Storbritannien',
-      'Ukraina', 'Sibirien', 'Östra Förenta Staterna', 'Mongoliet',
-      'Västra Förenta Staterna', 'Nordeuropa', 'Japan', 'Västeuropa',
+      'Ukraina', 'Sibirien', 'Ã–stra FÃ¶renta Staterna', 'Mongoliet',
+      'VÃ¤stra FÃ¶renta Staterna', 'Nordeuropa', 'Japan', 'VÃ¤steuropa',
       'Afghanistan', 'Sydeuropa', 'Kina', 'Centralamerika',
-      'Mellanöstern', 'Nordafrika', 'Egypten', 'Indien', 'Siam',
-      'Venezuela', 'Peru', 'Brasilien', 'Östafrika', 'Kongo',
+      'MellanÃ¶stern', 'Nordafrika', 'Egypten', 'Indien', 'Siam',
+      'Venezuela', 'Peru', 'Brasilien', 'Ã–stafrika', 'Kongo',
       'Indonesien', 'Nya Guinea', 'Madagaskar', 'Argentina',
-      'Sydafrika', 'Västra Australien', 'Östra Australien']
+      'Sydafrika', 'VÃ¤stra Australien', 'Ã–stra Australien']
 
     COUNTRY_BORDERING = [[4,5,7,8], [3,4,11], [3,10,14], [1,2,10,16,19],
       [0,1,7,11], [0,6,12], [5,12,13,18], [0,4,11,8,15,17], [0,7,15],
@@ -860,26 +860,26 @@ module Game
       params ||= @params
       result = []
       if params[:kill_player]
-        result << 'utplåna %s' % params[:kill_player].name
+        result << 'utplÃ¥na %s' % params[:kill_player].name
       end
       if not params[:continents].empty?
-        continents = 'erövra %s' % params[:continents].names.swedish
+        continents = 'erÃ¶vra %s' % params[:continents].names.swedish
         if params[:n_continents] > params[:continents].length
           continents << ', samt ytterligare %s' % (params[:n_continents] - params[:continents].length).swedish_quantity('valfri kontinent', 'valfria kontinenter')
         end
         result << continents
       elsif params[:n_continents] > 0
-        result << 'erövra %s' % (params[:n_continents] - params[:continents].length).swedish_quantity('valfri kontinent', 'valfria kontinenter')
+        result << 'erÃ¶vra %s' % (params[:n_continents] - params[:continents].length).swedish_quantity('valfri kontinent', 'valfria kontinenter')
       end
       if params[:n_countries] > 0
-        result << 'erövra %d valfria länder' % params[:n_countries]
+        result << 'erÃ¶vra %d valfria lÃ¤nder' % params[:n_countries]
       end
       if params[:min_armies_per_country] > 1
-        result << 'placera minst %d arméer i varje land' % params[:min_armies_per_country]
+        result << 'placera minst %d armÃ©er i varje land' % params[:min_armies_per_country]
       end
       result = result.swedish.capitalize0 + '.'
       if params[:kill_player]
-        result << ' Om du är %s, eller om någon annan utplånar %s, %s' % ([ params[:kill_player].name,
+        result << ' Om du Ã¤r %s, eller om nÃ¥gon annan utplÃ¥nar %s, %s' % ([ params[:kill_player].name,
                                                                               params[:kill_player].name,
                                                                               swedish(@fallback_params).downcase ])
       end

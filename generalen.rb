@@ -1,17 +1,18 @@
 #! /usr/bin/env ruby
+# coding: utf-8
 #--
 # Copyright (c) Nicklas Lindgren 2005-2007
 # Det här programmet distribueras under villkoren i GPL v2.
 #++
 
-require 'generalen/state'
-require 'generalen/game'
-require 'generalen/person'
-require 'www/servlet'
-require 'util/backup'
-require 'util/prefix_words_matches'
-require 'util/random'
-require 'kombot'
+require_relative 'generalen/state'
+require_relative 'generalen/game'
+require_relative 'generalen/person'
+require_relative 'www/servlet'
+require_relative 'util/backup'
+require_relative 'util/prefix_words_matches'
+require_relative 'util/random'
+require_relative 'kombot'
 require 'logger'
 # begin
 #   require 'readline'
@@ -102,7 +103,7 @@ $logger.info('started')
 $logger.level = 1
 
 Backup::with_rotation(STATE_FILE_NAME)
-$state = State.new(STATE_FILE_NAME, Random::Source.new)
+$state = State.new(STATE_FILE_NAME, Randomness::Source.new)
 $state.startup
 
 # Thread.abort_on_exception = true

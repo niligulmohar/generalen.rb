@@ -1,8 +1,8 @@
-require 'test/unit'
-require 'util/prefix_words_matches'
+require 'minitest/autorun'
+require_relative '../util/prefix_words_matches'
 require 'set'
 
-class PrefixTestCase < Test::Unit::TestCase
+class PrefixTestCase < Minitest::Test
   def setup
     @foo2 = %w{ foo bar }
     @foo3 = %w{ foo bar gazonk }
