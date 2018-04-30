@@ -57,7 +57,7 @@ $state = State.new(STATE_FILE_NAME, Randomness::Source.new)
 $state.startup
 
 $settings = {
-  :admin => '<@U0LHCLT0T>'
+  :admin => ENV['SLACK_GENERALEN_ADMIN'] || '<@U0LHCLT0T>'
 }
 
 Slack.configure do |config|
