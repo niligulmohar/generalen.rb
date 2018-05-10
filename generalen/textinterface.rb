@@ -1008,7 +1008,7 @@ module TextInterface
     if @current_game.people_players[self].mission.nil?
       post 'Du har inte tilldelats något uppdrag än!'
     else
-      post_mission(@current_game.people_players[self].mission.swedish)
+      post_mission(@current_game.people_players[self].mission)
     end
     missions = "De möjliga uppdragen är:\n\n" + @current_game.all_missions.collect{ |m| '  ' + m.swedish }.join("\n\n")
     post missions
