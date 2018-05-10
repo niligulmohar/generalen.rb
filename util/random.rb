@@ -9,7 +9,7 @@ class Array
     remaining = clone
     result = []
     n.times do
-      i = remaining[(0...remaining.length).random]
+      i = remaining[(0..remaining.length).random]
       remaining.delete i
       result << i
     end
