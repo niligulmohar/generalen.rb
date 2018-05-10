@@ -132,6 +132,9 @@ module Game
     def first_placement_done
       @round > 0
     end
+    def placements_allowed
+      @round != 1
+    end
     def ongoing
       first_placement_done and active
     end

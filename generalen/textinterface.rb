@@ -174,7 +174,7 @@ module TextInterface
       if player.game.turn_phase == 0
         if current
           parts << '%d att placera' % player.armies_for_placement if player.armies_for_placement != 0
-        else
+        elsif player.game.placements_allowed
           parts << '%d att placera' % player.bonus_armies
         end
       end
