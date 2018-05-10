@@ -22,7 +22,8 @@ end
 
 class Range
   def random
-    (rand * (last-first) + first).to_i
+    extra = exclude_end? ? 0 : 1
+    (rand * (last - first + extra) + first).to_i
   end
 end
 
