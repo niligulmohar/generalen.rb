@@ -454,11 +454,11 @@ module TextInterface
         @person.post_maybe_delayed(@game, message, params[:player] != player)
       when :move
         @person.post_map(@game) if params[:player] == player
-        message = "%s:\n  %s flyttar %s från %s till  %s.\n\n" % ([ @game.name,
-                                                                    params[:to].owner.person.name,
-                                                                    params[:armies].swedish_quantity('armé', 'arméer'),
-                                                                    params[:from].name,
-                                                                    params[:to].name ])
+        message = "%s:\n  %s flyttar %s från %s till %s.\n\n" % ([ @game.name,
+                                                                   params[:to].owner.person.name,
+                                                                   params[:armies].swedish_quantity('armé', 'arméer'),
+                                                                   params[:from].name,
+                                                                   params[:to].name ])
         message << "%23s: %2d - %2d = %2d\n%23s: %2d + %2d = %2d" % ([ params[:from].name,
                                                                        params[:from].armies + params[:armies],
                                                                        params[:armies],
