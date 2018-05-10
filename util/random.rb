@@ -9,7 +9,7 @@ class Array
     remaining = clone
     result = []
     n.times do
-      i = remaining[(0..remaining.length).random]
+      i = remaining[(0...remaining.length).random]
       remaining.delete i
       result << i
     end
@@ -22,7 +22,8 @@ end
 
 class Range
   def random
-    (rand * (last - first + 1) + first).to_i
+    extra = exclude_end? ? 0 : 1
+    (rand * (last - first + extra) + first).to_i
   end
 end
 
