@@ -22,7 +22,7 @@ end
 
 class Range
   def random
-    (rand * (last-first) + first).to_i
+    (rand * (last - first + 1) + first).to_i
   end
 end
 
