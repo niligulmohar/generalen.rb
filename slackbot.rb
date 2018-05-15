@@ -39,7 +39,7 @@ class SlackPerson < Person::TextInterfacePerson
   private
   def send_message(string)
     $logger.debug("Meddelande till %s:\n%s" % [name, string])
-    $slack.message channel: @channel, text: "```#{string}```"
+    $slack.message channel: @channel, text: "```#{string.gsub(' ', ' ')}```"
   end
 end
 
