@@ -120,5 +120,18 @@ module Game
         end
       end
     end
+
+    class StatsType < ChoiceSetting
+      def gen_choices
+        [ Choice.new('Av', false),
+          Choice.new('På', true) ]
+      end
+      def name
+        'Visa antal arméer och länder'
+      end
+      def description
+        'Anger huruvida summorna av alla spelares arméer och deras antal länder ska visas i gränssnittet.'
+      end
+    end
   end
 end

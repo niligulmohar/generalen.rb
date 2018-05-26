@@ -115,15 +115,20 @@ module TextInterface
           result << "  (%s) %s%s\n" % ([ INITIALS[player.number],
                                          player.name,
                                          player_info_str(player, player.person == self) ])
-          result << "    %s, %s%s (%s)\n" % ([ cards_str(player.cards, !player.game.finished),
-                                               player.countries.length.swedish_quantity('land', 'länder', :neutrum => true),
-                                               continents_str(player.continents),
-                                               armies_str(player) ])
+          if map.game.show_stats? or not map.game.active
+            result << "    %s, %s%s (%s)\n" % ([ cards_str(player.cards, !player.game.finished),
+                                                 player.countries.length.swedish_quantity('land', 'länder', :neutrum => true),
+                                                 continents_str(player.continents),
+                                                 armies_str(player) ])
+          else
+            result << "    %s%s\n" % ([ cards_str(player.cards, !player.game.finished),
+                                        brief_continents_str(player.continents) ])
+          end
           if player.mission and not map.game.active
             result << "    Uppdrag: %s\n" % player.mission.swedish
           end
         end
-        if map.game.started
+        if map.game.started and map.game.show_stats?
           country_distribution = map.game.initial_turn_order.collect{ |p| [INITIALS[p.number], p.countries.length] }
           army_distribution = map.game.initial_turn_order.collect{ |p| [INITIALS[p.number], p.armies] }
           plus_distribution = map.game.initial_turn_order.collect{ |p| [INITIALS[p.number], p.bonus_armies] }
@@ -217,6 +222,14 @@ module TextInterface
       ''
     else
       ' inklusive hela %s' % continents.collect{ |c| c.name }.swedish
+    end
+  end
+
+  def brief_continents_str(continents)
+    if continents.empty?
+      ''
+    else
+      ', hela %s' % continents.collect{ |c| c.name }.swedish
     end
   end
 
