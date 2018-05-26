@@ -525,11 +525,15 @@ module TextInterface
                 ['surfa'] => :svg_static,
                 ['uppdrag'] => :mission,
 
-                ['elisphack'] => :elisphack,
                 ['status'] => :status,
                 ['partier'] => :status,
                 ['gränser'] => :borders,
               })
+
+  if $KOM_SETTINGS
+    Commands[['elisphack']] = :elisphack
+  end
+
 
   PhaseNames = ['placera arméer eller använda kort', 'anfalla', 'flytta', 'avsluta din tur']
   PhasePastNames = [nil, 'anfallit', 'flyttat']
@@ -588,14 +592,17 @@ module TextInterface
                  "karta [SPEL]",
                  "gränser",
                  "säg TEXT",
-                 "elisphack",
                  "gå till [SPEL]",
                  "inställningar",
                  "sätt NAMN [= VÄRDE]",
                  "var smygig",
                  "var pratig",
                  "resumé [i brev]",
-                 "uppdrag" ]).sort
+                 "uppdrag" ])
+    if $KOM_SETTINGS
+      phrases << "elisphack"
+    end
+    phrases = phrases.sort
     text << phrases.column_list_view
     text << "\nNamn och fraser går att kom-förkorta varhelst man vill."
     text << "\n\nFramför klagomål till #{$settings[:admin]}"
