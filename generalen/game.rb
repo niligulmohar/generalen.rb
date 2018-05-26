@@ -65,6 +65,7 @@ module Game
       @random = random_source
       @settings = OrderedHash.new([ [ :gametype, Setting::GameType.new ],
                                     [ :cards, Setting::CardType.new ],
+                                    [ :stats, Setting::StatsType.new ],
                                     [ :timeout, Setting::Timeout.new ] ])
       @map = Map.new(self)
       @people_players = OrderedHash.new
@@ -171,6 +172,10 @@ module Game
 
     def combination_cards?
       @settings[:cards].nil? || @settings[:cards].value == :combination
+    end
+
+    def show_stats?
+      @settings[:stats].nil? || @settings[:stats].value == true
     end
 
     def push_deadline
