@@ -27,7 +27,20 @@ class SlackPerson < Person::TextInterfacePerson
   def flush
     begin
       unless messages.empty?
-        send_message(messages.join("\n\n"))
+        acc = []
+        messages.each do |message|
+          if message.respond_to? :attachments
+            unless acc.empty?
+              send_message(acc.join("\n\n"))
+            end
+            send_message(message)
+          else
+            acc << message
+          end
+        end
+        unless acc.empty?
+          send_message(acc.join("\n\n"))
+        end
       end
       @map_message = nil
       @messages.clear
@@ -37,9 +50,16 @@ class SlackPerson < Person::TextInterfacePerson
     "<@#{@user}>"
   end
   private
-  def send_message(string)
-    $logger.debug("Meddelande till %s:\n%s" % [name, string])
-    $slack.message channel: @channel, text: "```#{string.gsub(' ', ' ')}```"
+  def send_message(message)
+    if message.respond_to? :attachments
+      text = message.text
+      attachments = message.attachments
+    else
+      text = message
+      attachments = nil
+    end
+    $logger.debug("Meddelande till %s:\n%s" % [name, text])
+    $slack.web_client.chat_postMessage as_user: true, channel: @channel, text: "```#{text.gsub(' ', ' ')}```", attachments: attachments
   end
 end
 
@@ -68,7 +88,7 @@ end
 $slack = Slack::RealTime::Client.new
 
 $slack.on :message do |data|
-  $logger.info 'send_message %s: %s' % [ data.user, data.text ]
+  $logger.info 'send_message %s: %s' % [ data, data.text ]
   if data.user != $slack.self.id
     $state.with_person(data.user) do |p|
       if not p

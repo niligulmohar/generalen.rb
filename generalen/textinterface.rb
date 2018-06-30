@@ -27,6 +27,21 @@ module Enumerable
   end
 end
 
+class MapString
+  attr_accessor :map_string, :map_url, :text
+  def to_s
+    @map_string + @text
+  end
+  def attachments
+    [
+      {
+        fallback: "```#{@map_string}```",
+        image_url: @map_url,
+      }
+    ]
+  end
+end
+
 ######################################################################
 
 module TextInterface
@@ -97,6 +112,7 @@ module TextInterface
           end
         end
       else
+        map_string = MapString.new
         result = STANDARD_MAP % (if map.game.open
                                    [' ? '] * map.countries.length
                                  else
@@ -111,7 +127,19 @@ module TextInterface
                                        end
                                    end
                                  end)
-        result << "  %s%s%s%s\n" % [ map.game.name, (map.game.round > 0 ? ', omgång %d' % map.game.round : ''), deadline_str(map.game), progressive_cards_str(map.game) ]
+        map_string.map_string = result
+        args = map.countries.collect do |c|
+          (c.owner ? c.owner.number + 1 : 0) +
+            if c.owner && c.owner.person != self and not map.game.first_placement_done
+              0
+            elsif c.owner && c.owner.person != self
+              c.armies * 7
+            else
+              c.total_armies * 7
+            end
+          end.join(",")
+        map_string.map_url = "https://maps.gurkmoj.net/v0/#{args}"
+        result = "  %s%s%s%s\n" % [ map.game.name, (map.game.round > 0 ? ', omgång %d' % map.game.round : ''), deadline_str(map.game), progressive_cards_str(map.game) ]
         map.game.initial_turn_order.each do |player|
           result << "  (%s) %s%s\n" % ([ INITIALS[player.number],
                                          player.name,
@@ -142,7 +170,8 @@ module TextInterface
           result << " Arméer [%s]\n" % distribution_graph(army_distribution, 69)
           result << '   Plus [%s]' % distribution_graph(plus_distribution, 69)
         end
-        return result
+        map_string.text = result
+        return map_string
       end
     end
   end

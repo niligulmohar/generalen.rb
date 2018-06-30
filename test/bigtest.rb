@@ -160,7 +160,7 @@ class BigTestCase < Minitest::Test
       assert_match( /Turordningen.*Svenzuno.*Pelle/m, p.get )
       assert_match( /Du tilldelas fjorton länder.*Du har 26 arméer/m, p.get )
       p.command('karta')
-      assert_match( /~/, p.get )
+      assert_match( /~/, p.get.to_s )
       p.command('pl 3 ö a 3 arg 3 indo 3 bra 3 sia 3 norda 3 kin västeu 3 v f 2')
       assert_match( /Du har placerat/, p.get )
       assert_match( /Säg "klar"/, p.get )
