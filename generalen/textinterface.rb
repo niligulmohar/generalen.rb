@@ -568,6 +568,8 @@ module TextInterface
       post 'Du äger %s!' % e.params[:country].name
     rescue Game::BorderingException
       post 'Länderna gränsar inte till varandra!'
+    rescue Game::TooManyCardsException
+      post "Du måste byta in kort den här omgången!\nDu får inte ha fler än fem kort."
     end
   end
 
