@@ -59,7 +59,10 @@ class SlackPerson < Person::TextInterfacePerson
       attachments = nil
     end
     $logger.debug("Meddelande till %s:\n%s" % [name, text])
-    $slack.web_client.chat_postMessage as_user: true, channel: @channel, text: "```#{text.gsub(' ', ' ')}```", attachments: attachments
+    if text
+      text = "```#{text.gsub(' ', ' ')}```"
+    end
+    $slack.web_client.chat_postMessage as_user: true, channel: @channel, text: text, attachments: attachments
   end
 end
 

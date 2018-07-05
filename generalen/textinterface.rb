@@ -103,7 +103,8 @@ module TextInterface
       raise ArgumentError.new('Okänd karttyp')
     else
       if names
-        STANDARD_MAP % map.countries.collect do |c|
+        map_string = MapString.new
+        result = STANDARD_MAP % map.countries.collect do |c|
           words = c.name.split
           if words.length ==1
             words.first[0..2]
@@ -111,6 +112,9 @@ module TextInterface
             '%s %s' % [ words[0][0..0], words[1][0..0] ]
           end
         end
+        map_string.map_string = result
+        map_string.map_url = 'https://maps.gurkmoj.net/v0/'
+        return map_string
       else
         map_string = MapString.new
         result = STANDARD_MAP % (if map.game.open
