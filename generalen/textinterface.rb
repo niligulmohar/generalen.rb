@@ -28,7 +28,7 @@ module Enumerable
 end
 
 class MapString
-  attr_accessor :map_string, :map_url, :text
+  attr_accessor :map_string, :map_url, :text, :title, :title_url
   def to_s
     @map_string + @text
   end
@@ -37,6 +37,8 @@ class MapString
       {
         fallback: "```#{@map_string}```",
         image_url: @map_url,
+        title: @title,
+        title_link: @title_url,
       }
     ]
   end
@@ -114,6 +116,8 @@ module TextInterface
         end
         map_string.map_string = result
         map_string.map_url = 'https://maps.gurkmoj.net/v0/'
+        map_string.title = 'Karta'
+        map_string.title_url = 'https://maps.gurkmoj.net/v0/L/'
         return map_string
       else
         map_string = MapString.new
@@ -143,7 +147,10 @@ module TextInterface
             end
           end.join(",")
         map_string.map_url = "https://maps.gurkmoj.net/v0/#{args}"
-        result = "  %s%s%s%s\n" % [ map.game.name, (map.game.round > 0 ? ', omgång %d' % map.game.round : ''), deadline_str(map.game), progressive_cards_str(map.game) ]
+        title = map.game.name + (map.game.round > 0 ? ', omgång %d' % map.game.round : '')
+        map_string.title = title
+        map_string.title_url = "https://maps.gurkmoj.net/v0/L/#{args}"
+        result = "  %s%s%s\n" % [ title, deadline_str(map.game), progressive_cards_str(map.game) ]
         map.game.initial_turn_order.each do |player|
           result << "  (%s) %s%s\n" % ([ INITIALS[player.number],
                                          player.name,
