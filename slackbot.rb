@@ -13,6 +13,7 @@ require_relative 'util/prefix_words_matches'
 require_relative 'util/random'
 require 'logger'
 
+require 'eventmachine'
 require 'slack-ruby-client'
 
 
@@ -112,4 +113,28 @@ $slack.on :message do |data|
   $logger.debug "send_message %s done" % [ data.user, data.text ]
 end
 
-$slack.start!
+threads = []
+threads << $slack.start_async
+
+EM::next_tick do
+  EM::add_periodic_timer(1) do
+    $logger.debug 'periodic'
+    $slack.ping
+
+    $state.with_person(:admin) do |p|
+      $state.running_games.each do |g|
+        if $state.request(:person => p, :game => g, :type => :timeout_poll)
+          g.people.each do |p2|
+            p2.flush
+          end
+        end
+      end
+    end
+    $logger.debug 'periodic done'
+  end
+end
+
+begin
+  threads.each(&:join)
+rescue Interrupt
+end
