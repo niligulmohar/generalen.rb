@@ -71,7 +71,10 @@ end
 STATE_FILE_NAME = 'GENERALEN.STATE'
 LOG_FILE_NAME = 'GENERALEN.LOG'
 
-$logger = Logger.new(File.new(LOG_FILE_NAME, 'a+'), 10, 1024**2)
+log_file = File.new(LOG_FILE_NAME, 'a+')
+log_file.sync = true
+
+$logger = Logger.new(log_file, 10, 1024**2)
 $logger.info('started')
 $logger.level = 1
 
