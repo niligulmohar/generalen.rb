@@ -77,7 +77,7 @@ log_file.sync = true
 
 $logger = Logger.new(log_file, 10, 1024**2)
 $logger.info('started')
-$logger.level = 1
+$logger.level = 0
 
 Backup::with_rotation(STATE_FILE_NAME)
 $state = State.new(STATE_FILE_NAME, Randomness::Source.new)
