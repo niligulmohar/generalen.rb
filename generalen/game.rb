@@ -691,15 +691,14 @@ module Game
     NAME = :standard
 
     COUNTRY_NAMES = ['Grönland', 'Alaska', 'Jakutsk', 'Kamchatka',
-      'Nordvästra territoriet', 'Island', 'Skandinavien', 'Ontario',
-      'Quebec', 'Ural', 'Irkutsk', 'Alberta', 'Storbritannien',
-      'Ukraina', 'Sibirien', 'Östra Förenta Staterna', 'Mongoliet',
-      'Västra Förenta Staterna', 'Nordeuropa', 'Japan', 'Västeuropa',
-      'Afghanistan', 'Sydeuropa', 'Kina', 'Centralamerika',
-      'Mellanöstern', 'Nordafrika', 'Egypten', 'Indien', 'Siam',
+      'Nunavut', 'Island', 'Skandinavien', 'Ontario', 'Quebec',
+      'Ural', 'Irkutsk', 'Alberta', 'Albion', 'Ukraina', 'Sibirien',
+      'Texas', 'Mongoliet', 'Deseret', 'Preussen', 'Japan', 'Iberia',
+      'Khazakstan', 'Bysans', 'Kina', 'Centralamerika',
+      'Mellanöstern', 'Songhai', 'Egypten', 'Indien', 'Siam',
       'Venezuela', 'Peru', 'Brasilien', 'Östafrika', 'Kongo',
-      'Indonesien', 'Nya Guinea', 'Madagaskar', 'Argentina',
-      'Sydafrika', 'Västra Australien', 'Östra Australien']
+      'Borneo', 'Papua', 'Madagaskar', 'Argentina', 'Zimbabwe',
+      'Väst-Australien', 'Victoria']
 
     COUNTRY_BORDERING = [[4,5,7,8], [3,4,11], [3,10,14], [1,2,10,16,19],
       [0,1,7,11], [0,6,12], [5,12,13,18], [0,4,11,8,15,17], [0,7,15],
