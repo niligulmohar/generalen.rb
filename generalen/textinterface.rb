@@ -6,6 +6,7 @@
 
 require_relative '../util/view'
 require_relative '../util/swedish'
+require_relative '../generalen/game'
 
 module Enumerable
   def pick_from_with_rest(words, type = 'alternativ')
@@ -1080,7 +1081,9 @@ module TextInterface
   end
 
   def map(words = [])
-    if words.first =~ /^(namn|nam|na)$/
+    if not @current_game
+      post map_str(Game::Map.new(nil), true)
+    elsif words.first =~ /^(namn|nam|na)$/
       post map_str(current_game!.map, true)
     elsif words.empty?
       post map_str(current_game!.map)
