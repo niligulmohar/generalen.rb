@@ -114,7 +114,14 @@ $slack.on :message do |data|
 end
 
 threads = []
-threads << $slack.start_async
+
+$slack.on :closed do |data|
+  begin
+    threads << $slack.start_async
+  rescue Interrupt
+  end
+end
+
 
 EM::next_tick do
   EM::add_periodic_timer(1) do
@@ -135,6 +142,7 @@ EM::next_tick do
 end
 
 begin
+  threads << $slack.start_async
   threads.each(&:join)
 rescue Interrupt
 end
