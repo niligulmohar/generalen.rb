@@ -11,6 +11,9 @@ module Person
     end
     def name
     end
+    def raw_name
+      name
+    end
     def administrator?
       false
     end

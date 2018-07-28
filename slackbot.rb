@@ -50,6 +50,10 @@ class SlackPerson < Person::TextInterfacePerson
   def name
     "<@#{@user}>"
   end
+  def raw_name
+    user = $slack.users[@user]
+    user.profile.display_name
+  end
   private
   def send_message(message)
     if message.respond_to? :attachments

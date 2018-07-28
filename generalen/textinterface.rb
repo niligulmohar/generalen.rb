@@ -144,11 +144,14 @@ module TextInterface
             else
               c.total_armies * 7
             end
-          end.join(",")
-        map_string.map_url = "https://maps.gurkmoj.net/v0/#{args}"
+        end
+        map.game.players.each_with_index do |player, i|
+          args << "#{('a'.ord + i).chr}#{player.person.raw_name}"
+        end
+        map_string.map_url = "https://maps.gurkmoj.net/v0/#{args.join(',')}"
         title = map.game.name + (map.game.round > 0 ? ', omgång %d' % map.game.round : '')
         map_string.title = title
-        map_string.title_url = "https://maps.gurkmoj.net/v0/L/#{args}"
+        map_string.title_url = "https://maps.gurkmoj.net/v0/L/#{args.join(',')}"
         result = "  %s%s%s\n" % [ title, deadline_str(map.game), progressive_cards_str(map.game) ]
         map.game.initial_turn_order.each do |player|
           result << "  (%s) %s%s\n" % ([ INITIALS[player.number],
