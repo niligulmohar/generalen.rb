@@ -691,14 +691,13 @@ module Game
     NAME = :standard
 
     COUNTRY_NAMES = ['Grönland', 'Alaska', 'Jakutsk', 'Kamchatka',
-      'Nunavut', 'Island', 'Skandinavien', 'Ontario', 'Quebec',
-      'Ural', 'Irkutsk', 'Alberta', 'Albion', 'Ukraina', 'Sibirien',
-      'Texas', 'Mongoliet', 'Deseret', 'Preussen', 'Japan', 'Iberia',
-      'Khazakstan', 'Bysans', 'Kina', 'Centralamerika',
-      'Mellanöstern', 'Songhai', 'Egypten', 'Indien', 'Siam',
-      'Venezuela', 'Peru', 'Brasilien', 'Östafrika', 'Kongo',
-      'Borneo', 'Papua', 'Madagaskar', 'Argentina', 'Zimbabwe',
-      'Väst-Australien', 'Victoria']
+      'Nunavut', 'Island', 'Svitjod', 'Ontario', 'Quebec', 'Ural',
+      'Irkutsk', 'Alberta', 'Albion', 'Ukraina', 'Sibirien',
+      'Cherokee', 'Mongoliet', 'Sioux', 'Preussen', 'Japan', 'Iberia',
+      'Persien', 'Bysans', 'Kina', 'Mexico', 'Arabien', 'Songhai',
+      'Egypten', 'Indien', 'Siam', 'Venezuela', 'Peru', 'Brasilien',
+      'Östafrika', 'Kongo', 'Borneo', 'Papua', 'Madagaskar',
+      'Argentina', 'Zimbabwe', 'Sahul', 'Victoria']
 
     COUNTRY_BORDERING = [[4,5,7,8], [3,4,11], [3,10,14], [1,2,10,16,19],
       [0,1,7,11], [0,6,12], [5,12,13,18], [0,4,11,8,15,17], [0,7,15],
@@ -716,7 +715,7 @@ module Game
                     ['Asien', [2,3,9,10,14,16,19,21,23,25,28,29], 7],
                     ['Sydamerika', [30,31,32,38], 2],
                     ['Afrika', [26,27,33,34,37,39], 3],
-                    ['Australien', [35,36,40,41], 2] ])
+                    ['Oceanien', [35,36,40,41], 2] ])
 
     MAX_PLAYERS = 6
 
