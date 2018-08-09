@@ -52,7 +52,11 @@ class SlackPerson < Person::TextInterfacePerson
   end
   def raw_name
     user = $slack.users[@user]
-    user.profile.display_name
+    if user.profile.display_name.empty?
+      user.profile.real_name
+    else
+      user.profile.display_name
+    end
   end
   private
   def send_message(message)
