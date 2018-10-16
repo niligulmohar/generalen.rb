@@ -1041,6 +1041,13 @@ class BigTestCase < Minitest::Test
       assert(g.players.first.winner)
       assert(g.finished)
     end
+    $state.with_random_source do |r|
+      r.randrange_results.push(6)
+    end
+    $state.with_person(players.first) do |p|
+      p.command('klar')
+      assert_match( /Spelet är.*slut/m, p.get )
+    end
   end
 
   private

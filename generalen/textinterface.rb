@@ -173,7 +173,7 @@ module TextInterface
     elsif player.loser
       result << ' [Besegrad]'
     end
-    if player.game.in_turn(player.person) and player.game.first_placement_done and not player.game.finished
+    if player.game.in_turn(player) and player.game.first_placement_done and not player.game.finished
       result << ' [I tur]'
       return result if short
       parts = []
@@ -188,7 +188,7 @@ module TextInterface
         parts << '%d att flytta' % player.armies_for_movement
       end
       result << ' [%s]' % parts.join(', ') unless parts.empty?
-    elsif not player.game.first_placement_done and player.game.in_turn(player.person)
+    elsif not player.game.first_placement_done and player.game.in_turn(player)
       if current
         result << ' [%d att placera]' % player.armies_for_placement
       else
@@ -297,9 +297,9 @@ module TextInterface
       end
     end
     def maybe_auto_switch_game
-      in_turn_game = @person.games.values.detect{ |g| g.game.in_turn(@person) }
+      in_turn_game = @person.games.values.detect{ |g| g.game.person_in_turn(@person) }
       if in_turn_game
-        games = @person.games.values.select{ |g| g.game.in_turn(@person) }
+        games = @person.games.values.select{ |g| g.game.person_in_turn(@person) }
         games = games.sort{ |a, b| (a.turn_deadline || Float.max) <=> (b.turn_deadline || Float.max) }
         @person.go_to_impl(games.first.game)
       end
@@ -312,7 +312,7 @@ module TextInterface
     end
     def may_auto_change_game?
       if @person.current_game
-        @person.current_game != @game and not @person.current_game.in_turn(@person)
+        @person.current_game != @game and not @person.current_game.person_in_turn(@person)
       else
         true
       end
@@ -557,6 +557,10 @@ module TextInterface
       post e.message
     rescue Game::NotInTurnException
       post 'Du får vänta på din tur!'
+    rescue Game::GameNotStartedException
+      post 'Spelet har inte startat än!'
+    rescue Game::GameEndedException
+      post 'Spelet är redan slut!'
     rescue Game::TurnPhaseException => e
       if e.params[:from] == 0
         post 'Du får inte %s, för du är inte klar med dina placeringar!' % [ PhaseNames[e.params[:to]] ]
@@ -854,7 +858,7 @@ module TextInterface
     current_game!
     if not @current_game.started
       post 'Spelet har inte startat ännu.'
-    elsif not @hasty_done_warning and @current_game.first_placement_done and @current_game.in_turn(self) and
+    elsif not @hasty_done_warning and @current_game.first_placement_done and @current_game.person_in_turn(self) and
         @current_game.turn_phase == 0 and @current_game.turn_queue.first.armies_for_placement == 0
       @hasty_done_warning = true
       post 'Varning: "klar" avslutar din tur. Är du säker på att du inte vill "anfalla" eller "flytta"? Den här varningen upprepas inte.'
