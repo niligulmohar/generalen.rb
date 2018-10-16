@@ -1,16 +1,16 @@
-# -*- coding: iso-8859-1 -*-
+# coding: utf-8
 #--
 # Copyright (c) Nicklas Lindgren 2005-2006
-# Det här programmet distribueras under villkoren i GPL v2.
+# Det hÃ¤r programmet distribueras under villkoren i GPL v2.
 #++
 
 require 'forwardable'
 require 'observer'
 require 'set'
-require 'util/orderedhash'
-require 'util/swedish'
-require 'generalen/setting'
-require 'generalen/state'
+require_relative '../util/orderedhash'
+require_relative '../util/swedish'
+require_relative '../generalen/setting'
+require_relative '../generalen/state'
 
 class String
   def capitalize0
@@ -41,6 +41,8 @@ module Game
   class MovesExhaustedException < RequestException; end
   class IllegalCardComboException < RequestException; end
   class InsuficcentCardsException < RequestException; end
+  class GameNotStartedException < RequestException; end
+  class GameEndedException < RequestException; end
 
   CARD_COMBOS = ([ [ { :a => 3, :b => 0, :c => 0, :* => 0 }, 4 ],
                    [ { :a => 2, :b => 0, :c => 0, :* => 1 }, 4 ],
@@ -65,6 +67,7 @@ module Game
       @random = random_source
       @settings = OrderedHash.new([ [ :gametype, Setting::GameType.new ],
                                     [ :cards, Setting::CardType.new ],
+                                    [ :stats, Setting::StatsType.new ],
                                     [ :timeout, Setting::Timeout.new ] ])
       @map = Map.new(self)
       @people_players = OrderedHash.new
@@ -132,16 +135,32 @@ module Game
     def first_placement_done
       @round > 0
     end
+    def placements_allowed
+      @round != 1
+    end
     def ongoing
       first_placement_done and active
     end
-    def in_turn(person)
+    def person_in_turn(person)
+      in_turn(@people_players[person])
+    end
+    def in_turn(player)
+      # if (not @started) or @ended
       if not @started or @ended
         false
       elsif first_placement
-        not @people_players[person].first_placement_done
+        not player.first_placement_done
       else
-        @turn_queue.first != :new_round and @turn_queue.first.person == person
+        @turn_queue.first != :new_round and @turn_queue.first == player
+      end
+    end
+    def assert_in_turn!(player)
+      if not @started
+        raise GameNotStartedException.new
+      elsif @ended
+        raise GameEndedException.new
+      elsif not in_turn(player)
+        raise NotInTurnException.new
       end
     end
     def active_players
@@ -168,6 +187,10 @@ module Game
 
     def combination_cards?
       @settings[:cards].nil? || @settings[:cards].value == :combination
+    end
+
+    def show_stats?
+      @settings[:stats].nil? || @settings[:stats].value == true
     end
 
     def push_deadline
@@ -271,7 +294,7 @@ module Game
     end
 
     def surrender(params = {})
-      advance_turn_afterwards = (@turn_queue.first == params[:player])
+      advance_turn_afterwards = in_turn(params[:player])
       @turn_queue.delete(params[:player])
       changed
       notify_observers(:surrender, :person => params[:person])
@@ -287,16 +310,9 @@ module Game
     end
 
     def place(params = {})
-      if not first_placement_done
-        if params[:player].first_placement_done
-          raise NotInTurnException.new
-        end
-      else
-        if @turn_queue.first != params[:player]
-          raise NotInTurnException.new
-        else
-          advance_turn_phase(0)
-        end
+      assert_in_turn!(params[:player])
+      if first_placement_done
+        advance_turn_phase(0)
       end
       max_armies = first_placement_done ? nil : 4
       placements = []
@@ -335,143 +351,131 @@ module Game
           end
         end
       else
-        if @turn_queue.first != params[:player]
-          raise NotInTurnException.new
-        else
-          advance_turn_phase(3)
-          advance_turn
-        end
+        assert_in_turn!(params[:player])
+        advance_turn_phase(3)
+        advance_turn
       end
     end
 
     def attack(params = {})
-      if @turn_queue.first != params[:player]
-        raise NotInTurnException.new
+      assert_in_turn!(params[:player])
+      advance_turn_phase(1)
+      if params[:target].owner == params[:player]
+        raise CountryOwnerException.new(:country => params[:target])
+      elsif params[:from].owner != params[:player]
+        raise NotCountryOwnerException.new(:country => params[:from])
+      elsif params[:armies] < 1
+        raise TooFewArmiesException.new
+      elsif params[:armies] > params[:from].armies - 1
+        raise TooManyArmiesException.new
+      elsif not params[:target].borders.include?(params[:from])
+        raise BorderingException.new
       else
-        advance_turn_phase(1)
-        if params[:target].owner == params[:player]
-          raise CountryOwnerException.new(:country => params[:target])
-        elsif params[:from].owner != params[:player]
-          raise NotCountryOwnerException.new(:country => params[:from])
-        elsif params[:armies] < 1
-          raise TooFewArmiesException.new
-        elsif params[:armies] > params[:from].armies - 1
-          raise TooManyArmiesException.new
-        elsif not params[:target].borders.include?(params[:from])
-          raise BorderingException.new
-        else
-          begin
-            attacker_losses = 0
-            defender_losses = 0
-            attack_dice = [params[:armies], 3].min
-            defence_dice = [params[:target].armies, 2].min
-            attack = (1..attack_dice).collect{ @random.randrange(1..6) }.sort.reverse
-            defence = (1..defence_dice).collect{ @random.randrange(1..6) }.sort.reverse
-            attack.zip(defence).each do |a, d|
-              if a and d
-                if a > d
-                  defender_losses += 1
-                else
-                  attacker_losses += 1
-                end
+        begin
+          attacker_losses = 0
+          defender_losses = 0
+          attack_dice = [params[:armies], 3].min
+          defence_dice = [params[:target].armies, 2].min
+          attack = (1..attack_dice).collect{ @random.randrange(1..6) }.sort.reverse
+          defence = (1..defence_dice).collect{ @random.randrange(1..6) }.sort.reverse
+          attack.zip(defence).each do |a, d|
+            if a and d
+              if a > d
+                defender_losses += 1
+              else
+                attacker_losses += 1
               end
             end
-            params[:from].armies -= attacker_losses
-            params[:armies] -= attacker_losses
-            params[:target].armies -= defender_losses
-            changed
-            notify_observers(:attack, params.merge(:attack => attack,
-                                                   :defence => defence,
-                                                   :attacker_losses => attacker_losses,
-                                                   :defender_losses => defender_losses))
-            break if params[:armies] < 3 or params[:target].armies == 0
-          end while params[:destroy]
-          if params[:target].armies == 0
-            loser = params[:target].owner
-            params[:target].owner = params[:player]
-            params[:target].armies = params[:armies]
-            params[:from].armies -= params[:armies]
-            params[:player].card_earned = true
-            changed
-            notify_observers(:conquer, params)
-            if loser && loser.countries.empty?
-              loser.loser = true
-              params[:player].has_defeated << loser
-              @turn_queue.delete(loser)
-              changed
-              notify_observers(:defeated, :person => loser, :by_person => params[:person], :cards => loser.cards, :n_cards => loser.total_cards)
-              loser.cards.keys.each do |c|
-                params[:player].cards[c] += loser.cards[c]
-                loser.cards[c] = 0
-              end
-            end
-            maybe_end_game
           end
+          params[:from].armies -= attacker_losses
+          params[:armies] -= attacker_losses
+          params[:target].armies -= defender_losses
+          changed
+          notify_observers(:attack, params.merge(:attack => attack,
+                                                  :defence => defence,
+                                                  :attacker_losses => attacker_losses,
+                                                  :defender_losses => defender_losses))
+          break if params[:armies] < 3 or params[:target].armies == 0
+        end while params[:destroy]
+        if params[:target].armies == 0
+          loser = params[:target].owner
+          params[:target].owner = params[:player]
+          params[:target].armies = params[:armies]
+          params[:from].armies -= params[:armies]
+          params[:player].card_earned = true
+          changed
+          notify_observers(:conquer, params)
+          if loser && loser.countries.empty?
+            loser.loser = true
+            params[:player].has_defeated << loser
+            @turn_queue.delete(loser)
+            changed
+            notify_observers(:defeated, :person => loser, :by_person => params[:person], :cards => loser.cards, :n_cards => loser.total_cards)
+            loser.cards.keys.each do |c|
+              params[:player].cards[c] += loser.cards[c]
+              loser.cards[c] = 0
+            end
+          end
+          maybe_end_game
         end
       end
       return params[:armies]
     end
 
     def move(params = {})
-      if @turn_queue.first != params[:player]
-        raise NotInTurnException.new
+      assert_in_turn!(params[:player])
+      advance_turn_phase(2)
+      if params[:to].owner != params[:player]
+        raise NotCountryOwnerException.new(:country => params[:to])
+      elsif params[:from].owner != params[:player]
+        raise NotCountryOwnerException.new(:country => params[:from])
+      elsif params[:armies] < 1
+        raise TooFewArmiesException.new
+      elsif params[:armies] > params[:from].movable_armies
+        raise TooManyArmiesException.new
+      elsif params[:armies] > params[:player].armies_for_movement
+        raise MovesExhaustedException.new
+      elsif not params[:to].borders.include?(params[:from])
+        raise BorderingException.new
       else
-        advance_turn_phase(2)
-        if params[:to].owner != params[:player]
-          raise NotCountryOwnerException.new(:country => params[:to])
-        elsif params[:from].owner != params[:player]
-          raise NotCountryOwnerException.new(:country => params[:from])
-        elsif params[:armies] < 1
-          raise TooFewArmiesException.new
-        elsif params[:armies] > params[:from].movable_armies
-          raise TooManyArmiesException.new
-        elsif params[:armies] > params[:player].armies_for_movement
-          raise MovesExhaustedException.new
-        elsif not params[:to].borders.include?(params[:from])
-          raise BorderingException.new
-        else
-          params[:from].armies -= params[:armies]
-          params[:to].armies += params[:armies]
-          params[:to].moved_armies += params[:armies]
-          params[:player].armies_for_movement -= params[:armies]
-          changed
-          notify_observers(:move, params)
-          if params[:player].mission and params[:player].mission.params[:min_armies_per_country] > 1
-            maybe_end_game
-          end
-          if params[:player].armies_for_movement == 0
-            advance_turn
-          end
+        params[:from].armies -= params[:armies]
+        params[:to].armies += params[:armies]
+        params[:to].moved_armies += params[:armies]
+        params[:player].armies_for_movement -= params[:armies]
+        changed
+        notify_observers(:move, params)
+        if params[:player].mission and params[:player].mission.params[:min_armies_per_country] > 1
+          maybe_end_game
+        end
+        if params[:player].armies_for_movement == 0
+          advance_turn
         end
       end
     end
 
     def cards(params = {})
-      if @turn_queue.first != params[:player]
-        raise NotInTurnException.new
+      assert_in_turn!(params[:player])
+      advance_turn_phase(0)
+      if not CARD_COMBOS.assoc(params[:cards])
+        raise IllegalCardComboException.new
+      elsif params[:cards].sort.zip(@turn_queue.first.cards.sort).any?{ |c, p| c.last > p.last }
+        raise InsuficcentCardsException.new
       else
-        advance_turn_phase(0)
-        if not CARD_COMBOS.assoc(params[:cards])
-          raise IllegalCardComboException.new
-        elsif params[:cards].sort.zip(@turn_queue.first.cards.sort).any?{ |c, p| c.last > p.last }
-          raise InsuficcentCardsException.new
+        @n_card_combos ||= 0
+        @n_card_combos += 1
+        if combination_cards?
+          bonus_armies = CARD_COMBOS.assoc(params[:cards]).last
+        elsif progressive_cards?
+          bonus_armies = progressive_card_value(@n_card_combos)
         else
-          @n_card_combos ||= 0
-          @n_card_combos += 1
-          if combination_cards?
-            bonus_armies = CARD_COMBOS.assoc(params[:cards]).last
-          elsif progressive_cards?
-            bonus_armies = progressive_card_value(@n_card_combos)
-          else
-            raise RuntimeError.new
-          end
-          params[:cards].each do |card, n|
-            params[:player].cards[card] -= n
-          end
-          @turn_queue.first.armies_for_placement += bonus_armies
-          changed
-          notify_observers(:cards, params.merge(:armies => bonus_armies))
+          raise RuntimeError.new
         end
+        params[:cards].each do |card, n|
+          params[:player].cards[card] -= n
+        end
+        @turn_queue.first.armies_for_placement += bonus_armies
+        changed
+        notify_observers(:cards, params.merge(:armies => bonus_armies))
       end
     end
 
@@ -480,7 +484,7 @@ module Game
       @initial_turn_order = @turn_queue.clone
       @started = true
       if @settings[:gametype].value == :mission
-        missions = (0...@map.n_missions(@people_players.length)).collect
+        missions = (0...@map.n_missions(@people_players.length)).to_a
         players.each do |p|
           mission = @random.choose_n_from(1, missions).first
           missions.delete(mission)
@@ -575,10 +579,10 @@ module Game
         if @turn_queue.first.card_earned
           @turn_queue.first.card_earned = false
           @turn_queue.first.recieve_card(case @random.randrange(0...44)
-                                         when 0..13: :a
-                                         when 14..27: :b
-                                         when 28..41: :c
-                                         when 42..43: :*
+                                         when 0..13 then :a
+                                         when 14..27 then :b
+                                         when 28..41 then :c
+                                         when 42..43 then :*
                                          end)
           changed
           notify_observers(:card, :to_player => @turn_queue.first)
@@ -686,16 +690,16 @@ module Game
 
     NAME = :standard
 
-    COUNTRY_NAMES = ['Grönland', 'Alaska', 'Jakutsk', 'Kamchatka',
-      'Nordvästra territoriet', 'Island', 'Skandinavien', 'Ontario',
+    COUNTRY_NAMES = ['GrÃ¶nland', 'Alaska', 'Jakutsk', 'Kamchatka',
+      'NordvÃ¤stra territoriet', 'Island', 'Skandinavien', 'Ontario',
       'Quebec', 'Ural', 'Irkutsk', 'Alberta', 'Storbritannien',
-      'Ukraina', 'Sibirien', 'Östra Förenta Staterna', 'Mongoliet',
-      'Västra Förenta Staterna', 'Nordeuropa', 'Japan', 'Västeuropa',
+      'Ukraina', 'Sibirien', 'Ã–stra FÃ¶renta Staterna', 'Mongoliet',
+      'VÃ¤stra FÃ¶renta Staterna', 'Nordeuropa', 'Japan', 'VÃ¤steuropa',
       'Afghanistan', 'Sydeuropa', 'Kina', 'Centralamerika',
-      'Mellanöstern', 'Nordafrika', 'Egypten', 'Indien', 'Siam',
-      'Venezuela', 'Peru', 'Brasilien', 'Östafrika', 'Kongo',
+      'MellanÃ¶stern', 'Nordafrika', 'Egypten', 'Indien', 'Siam',
+      'Venezuela', 'Peru', 'Brasilien', 'Ã–stafrika', 'Kongo',
       'Indonesien', 'Nya Guinea', 'Madagaskar', 'Argentina',
-      'Sydafrika', 'Västra Australien', 'Östra Australien']
+      'Sydafrika', 'VÃ¤stra Australien', 'Ã–stra Australien']
 
     COUNTRY_BORDERING = [[4,5,7,8], [3,4,11], [3,10,14], [1,2,10,16,19],
       [0,1,7,11], [0,6,12], [5,12,13,18], [0,4,11,8,15,17], [0,7,15],
@@ -860,26 +864,26 @@ module Game
       params ||= @params
       result = []
       if params[:kill_player]
-        result << 'utplåna %s' % params[:kill_player].name
+        result << 'utplÃ¥na %s' % params[:kill_player].name
       end
       if not params[:continents].empty?
-        continents = 'erövra %s' % params[:continents].names.swedish
+        continents = 'erÃ¶vra %s' % params[:continents].names.swedish
         if params[:n_continents] > params[:continents].length
           continents << ', samt ytterligare %s' % (params[:n_continents] - params[:continents].length).swedish_quantity('valfri kontinent', 'valfria kontinenter')
         end
         result << continents
       elsif params[:n_continents] > 0
-        result << 'erövra %s' % (params[:n_continents] - params[:continents].length).swedish_quantity('valfri kontinent', 'valfria kontinenter')
+        result << 'erÃ¶vra %s' % (params[:n_continents] - params[:continents].length).swedish_quantity('valfri kontinent', 'valfria kontinenter')
       end
       if params[:n_countries] > 0
-        result << 'erövra %d valfria länder' % params[:n_countries]
+        result << 'erÃ¶vra %d valfria lÃ¤nder' % params[:n_countries]
       end
       if params[:min_armies_per_country] > 1
-        result << 'placera minst %d arméer i varje land' % params[:min_armies_per_country]
+        result << 'placera minst %d armÃ©er i varje land' % params[:min_armies_per_country]
       end
       result = result.swedish.capitalize0 + '.'
       if params[:kill_player]
-        result << ' Om du är %s, eller om någon annan utplånar %s, %s' % ([ params[:kill_player].name,
+        result << ' Om du Ã¤r %s, eller om nÃ¥gon annan utplÃ¥nar %s, %s' % ([ params[:kill_player].name,
                                                                               params[:kill_player].name,
                                                                               swedish(@fallback_params).downcase ])
       end

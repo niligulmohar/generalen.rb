@@ -1,19 +1,19 @@
-# -*- coding: iso-8859-1 -*-
+# coding: utf-8
 #--
 # Copyright (c) Nicklas Lindgren 2005-2006
-# Det h‰r programmet distribueras under villkoren i GPL v2.
+# Det h√§r programmet distribueras under villkoren i GPL v2.
 #++
 
 class String
   alias_method :old_downcase, :downcase
   def downcase
-    self.old_downcase.tr('≈ƒ÷…', 'Â‰ˆÈ')
+    self.old_downcase.tr('√Ö√Ñ√ñ√â', '√•√§√∂√©')
   end
 end
 
 module Enumerable
   def swedish(word = "och")
-    words = collect
+    words = to_a
     if length > 1
       [words[0..-2].join(', '), words[-1]].join(' %s ' % word)
     else
@@ -23,18 +23,18 @@ module Enumerable
 end
 
 class Integer
-  SWEDISH_NUMBERS = ["inga", nil, "tvÂ", "tre", "fyra",
-    "fem", "sex", "sju", "Âtta", "nio",
+  SWEDISH_NUMBERS = ["inga", nil, "tv√•", "tre", "fyra",
+    "fem", "sex", "sju", "√•tta", "nio",
     "tio", "elva", "tolv", "tretton", "fjorton",
     "femton", "sexton", "sjutton", "arton", "nitton"]
 
   SWEDISH_ONE = ["en", "ett"]
 
   SWEDISH_TENS = ["tjugo", "trettio", "fyrtio", "femtio",
-    "sextio", "sjuttio", "Âttio", "nittio"]
+    "sextio", "sjuttio", "√•ttio", "nittio"]
 
-  SWEDISH_ORDINALS = ["fˆrsta", "andra", "tredje", "fj‰rde", "femte",
-    "sj‰tte", "sjunde", "Âttonde", "nionde", "tionde",
+  SWEDISH_ORDINALS = ["f√∂rsta", "andra", "tredje", "fj√§rde", "femte",
+    "sj√§tte", "sjunde", "√•ttonde", "nionde", "tionde",
     "elfte", "tolfte", "trettonde", "fjortonde", "femtonde",
     "sextonde", "sjuttonde", "artonde", "nittonde"]
 

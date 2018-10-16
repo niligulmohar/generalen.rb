@@ -1,4 +1,4 @@
-/* -*- coding:iso-8859-1 -*- */
+/* -*- coding:utf-8 -*- */
 
 var G = {
     requests: {count: 0, pending:0, consecutive_failures: 0},
@@ -19,7 +19,7 @@ var G = {
 	    G.listen();
 	}
 	else {
-	    G.error_message('Generalen är på väg ner ...');
+	    G.error_message('Generalen Ã¤r pÃ¥ vÃ¤g ner ...');
 	    //G.state(-1);
 	}
     },

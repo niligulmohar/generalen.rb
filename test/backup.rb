@@ -1,8 +1,8 @@
-require 'util/backup'
+require_relative '../util/backup'
 require 'fileutils'
-require 'test/unit'
+require 'minitest/autorun'
 
-class BackupTestCase < Test::Unit::TestCase
+class BackupTestCase < Minitest::Test
   FILENAME = 'BACKUPTESTCASE'
   class << FILENAME
     def n(n)

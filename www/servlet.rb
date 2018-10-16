@@ -1,7 +1,7 @@
-# -*- coding: iso-8859-1 -*-
+# coding: utf-8
 #--
 # Copyright (c) Nicklas Lindgren 2005-2007
-# Det h‰r programmet distribueras under villkoren i GPL v2.
+# Det h√§r programmet distribueras under villkoren i GPL v2.
 #++
 
 require 'webrick'

@@ -1,8 +1,9 @@
+# coding: utf-8
 #--
 # Copyright (c) Nicklas Lindgren 2005-2006
 # Det här programmet distribueras under villkoren i GPL v2.
 #++
-require 'util/swedish'
+require_relative '../util/swedish'
 
 class Hash
   def prefix_words_matches(words, allow_match_all = false)

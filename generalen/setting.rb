@@ -1,7 +1,7 @@
-# -*- coding: iso-8859-1 -*-
+# coding: utf-8
 #--
 # Copyright (c) Nicklas Lindgren 2005-2006
-# Det h‰r programmet distribueras under villkoren i GPL v2.
+# Det h√§r programmet distribueras under villkoren i GPL v2.
 #++
 
 module Game
@@ -14,10 +14,10 @@ module Game
         []
       end
       def name
-        'Testinst‰llning'
+        'Testinst√§llning'
       end
       def description
-        'NÂgon sorts inst‰llning'
+        'N√•gon sorts inst√§llning'
       end
       def value
         @value
@@ -52,7 +52,7 @@ module Game
         @choices[0]
       end
       def name
-        'Flervalsinst‰llning'
+        'Flervalsinst√§llning'
       end
       def value
         @value.value
@@ -71,7 +71,7 @@ module Game
     class GameType < ChoiceSetting
       def gen_choices
         [ Choice.new('Hemligt uppdrag', :mission),
-          Choice.new('V‰rldsdominans', :dominance) ]
+          Choice.new('V√§rldsdominans', :dominance) ]
       end
       def name
         'Speltyp'
@@ -87,10 +87,10 @@ module Game
           Choice.new('Progressivt', :progressive) ]
       end
       def name
-        'Inbytesv‰rde fˆr kort'
+        'Inbytesv√§rde f√∂r kort'
       end
       def description
-        'Anger reglerna fˆr hur mÂnga armÈer kortkombinationer ‰r v‰rda.'
+        'Anger reglerna f√∂r hur m√•nga arm√©er kortkombinationer √§r v√§rda.'
       end
     end
 
@@ -102,14 +102,14 @@ module Game
         'Dragtid'
       end
       def description
-        'Tidsfrist i minuter som en spelare har pÂ sig att genomfˆra sitt drag'
+        'Tidsfrist i minuter som en spelare har p√• sig att genomf√∂ra sitt drag'
       end
       def set(int)
         @value = int
       end
       def to_s
         if @value <= 0
-          'Obegr‰nsad'
+          'Obegr√§nsad'
         else
           hours = @value / 60
           minutes = @value % 60
@@ -118,6 +118,19 @@ module Game
           parts << minutes.swedish_quantity('minut', 'minuter') if minutes > 0
           '%d (%s)' % [@value, parts.swedish]
         end
+      end
+    end
+
+    class StatsType < ChoiceSetting
+      def gen_choices
+        [ Choice.new('Av', false),
+          Choice.new('P√•', true) ]
+      end
+      def name
+        'Visa antal arm√©er och l√§nder'
+      end
+      def description
+        'Anger huruvida summorna av alla spelares arm√©er och deras antal l√§nder ska visas i gr√§nssnittet.'
       end
     end
   end
